@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'wordpress/wordpress-header.html' %}
+{% load static %}
+<div class="container">
+    <h1>Listados Tweets</h1>
+    <p>A continuación, se muestran todos los tweets pertenecientes a la consulta seleccionada.</p>
+    <p>Acciones disponibles: </p>
+    <ul>        
+        <li><a href={{ query.get_update_tweets_url }}>Actualizar <img src="{% static 'arrow-counterclockwise.svg' %}" alt="update" width="16" height="16"> </a></li>
+        {% if tweets %}
+            <li> <a href={{ query.get_download_tweets_url }}>Descargar <img src="{% static 'cloud-arrow-down.svg' %}" alt="download" width="16" height="16"> </a></li>
+        {% endif %}
+    </ul>
+    <hr class="my-4">
+
+    <h2>Tweets</h2>
+    <p>Listado de tweets almacenados:</p>
+    <ul>
+        {% for tweet in tweets  %}
+            <li>{{ tweet.text }}</li>
+        {% empty %}
+            <li>No hay tweets registrados.</li>
+        {% endfor %}
+    </ul>
+    <hr class="my-4">    
+
+    {% if is_paginated %}
+        <nav aria-label="Tweets Results">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+                {% else %}
+                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true"><span>&laquo;</span></a></li>
+                {% endif %}
+                {% for i in paginator.page_range %}
+                    {% if page_obj.number == i %}
+                        <li class="page-item active" aria-current="page"><a class="page-link" href="#" tabindex="-1" aria-disabled="true"><span>{{ i }} </span></a></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+                {% else %}
+                    <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true"><span>&raquo;</span></a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+{% endblock %}

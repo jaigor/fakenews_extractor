@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<div class="container py-5">
+    <h1 class="pb-2 border-bottom">Fake News</h1>
+    <p>Explicacion tipo Fake News</p>
+    <div class="row g-5 py-5">
+        <div class="col-md-4 d-flex align-items-start">
+          <div class="icon-square bg-light text-dark flex-shrink-0 me-3">            
+            <img src="{% static 'Wordpress-Logo.svg' %}" alt="Wordpress" width="32" height="32">
+          </div>
+          <div>
+            <h2>Wordpress Extractor</h2>
+            <p>Texto explicacion Wordpress</p>
+            <a href="./wordpress/list/" class="btn btn-primary">
+              Acceder
+            </a>
+          </div>
+        </div>
+
+        <div class="col-md-4 d-flex align-items-start">
+          <div class="icon-square bg-light text-dark flex-shrink-0 me-3">
+            <img src="{% static 'Search_Icon.svg' %}" alt="Search" width="32" height="32">
+          </div>
+          <div>
+            <h2>Scrapper Extractor</h2>
+            <p>Texto explicacion Scrapper</p>
+            <a href="./soup/list/" class="btn btn-primary">
+                Acceder
+            </a>
+          </div>
+        </div>        
+      </div>
+</div>
+{% endblock %}

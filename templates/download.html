@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<div class="container py-5">
+    <h1 class="pb-2 border-bottom">Descarga de CSV</h1>
+      <div class="row g-5 py-5">
+          <div class="col-md-4 d-flex align-items-start">
+            <div class="icon-square bg-light text-dark flex-shrink-0 me-3">            
+              <img src="{% static 'Search_Icon.svg' %}" alt="Fake News" width="32" height="32">
+            </div>
+            <div>
+              <h2>Fakes News</h2>
+              <p>Texto explicacion Fakes News</p>
+              <a href="/downloadposts/" class="btn btn-primary">
+                Descargar
+              </a>
+            </div>
+          </div>
+
+          <div class="col-md-4 d-flex align-items-start">
+            <div class="icon-square bg-light text-dark flex-shrink-0 me-3">            
+              <img src="{% static 'Twitter_icon.svg' %}" alt="Perfiles" width="32" height="32">
+            </div>
+            <div>
+              <h2>Perfiles de redes sociales</h2>
+              <p>Texto explicacion Perfiles</p>
+              <a href="/downloadusers/" class="btn btn-primary">
+                Descargar
+              </a>
+            </div>
+          </div>
+      </div>
+</div>
+
+
+{% endblock %}

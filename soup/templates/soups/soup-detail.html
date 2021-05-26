@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'soups/soup-header.html' %}
+<div class="container">
+    <h1>Detalle página Scrapping</h1>
+    <p>Descarga de la página almacenada:</p>
+    <ul>
+        <li>{{ object.url }}</li>
+        <li>{{ object.link_class }}</li>
+        <li>{{ object.date_type }}</li>
+        <li>{{ object.date_id }}</li>    
+    </ul>
+    <p><a class="btn btn-primary" href={{ object.get_posts_url }}>Ver posts</a></p>
+    <hr class="my-4">
+</div>
+{% endblock %}

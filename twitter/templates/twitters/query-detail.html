@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'twitters/twitter-header.html' %}
+<div class="container">
+    <h1>Detalle página Twitter</h1>
+    <p>Información</p>
+    <ul>
+        <li>{{ object.text }}</li>
+    </ul>
+    <p><a class="btn btn-primary" href={{ object.get_tweets_url }}>Ver tweets</a></p>
+    <hr class="my-4">
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'twitters/twitter-header.html' %}
+<div class="container">
+    <h1>Modificar página Twitter</h1>
+
+    <p>Rellene los datos del formulario para obtener la información</p>
+    <form action='.' method='POST'>  {% csrf_token %}
+        <div class="mb-3">
+            {{ form }}
+        </div> 
+        <input type='submit' value='Descarga' class="btn btn-primary" />
+    </form>
+</div>
+{% endblock %}
