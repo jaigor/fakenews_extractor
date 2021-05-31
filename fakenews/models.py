@@ -3,19 +3,20 @@ from django.urls import reverse
 from urllib.parse import urlparse
 from .base_models import FakeNewsManager, FakeNews
 
+
 ##### Wordpress type #######
 class WordpressManager(FakeNewsManager):
-    
+
     def find_by_domain(self, domain):
         queryset = self.get_queryset()
         return queryset.filter(domain=domain)
-    
+
     def create_wordpress(self, url, post_type, domain):
         wordpress = Wordpress.objects.create(
             url=url,
             post_type=post_type,
             domain=domain,
-            )
+        )
         wordpress.save()
         return wordpress
 
@@ -26,10 +27,11 @@ class WordpressManager(FakeNewsManager):
             domain=domain,
         )
 
+
 class Wordpress(FakeNews):
-    post_type   = models.CharField(max_length=120, default='')
-    domain      = models.CharField(max_length=120, default='')
-    objects     = WordpressManager()
+    post_type = models.CharField(max_length=120, default='')
+    domain = models.CharField(max_length=120, default='')
+    objects = WordpressManager()
 
     def get_url_domain(self):
         return urlparse(self.url).netloc
@@ -52,6 +54,7 @@ class Wordpress(FakeNews):
     def get_download_posts_url(self):
         return reverse("fakenews:post-download", kwargs={"id": self.id})
 
+
 ##### SOUP TYPE #######
 class SoupManager(FakeNewsManager):
 
@@ -61,26 +64,26 @@ class SoupManager(FakeNewsManager):
             link_class=link_class,
             date_type=date_type,
             date_id=date_id,
-            )
+        )
         soup.save()
         return soup
 
-class Soup(FakeNews):
 
-    ATTR_CHOICES =( 
+class Soup(FakeNews):
+    ATTR_CHOICES = (
         ("1", "Id"),
         ("2", "Class")
-    )    
-    link_class  = models.CharField(max_length=120) #max_lenght = required
-    date_type   = models.CharField(max_length=1, choices=ATTR_CHOICES)
-    date_id     = models.CharField(max_length=120)
-    objects     = SoupManager()
+    )
+    link_class = models.CharField(max_length=120)  # max_lenght = required
+    date_type = models.CharField(max_length=1, choices=ATTR_CHOICES)
+    date_id = models.CharField(max_length=120)
+    objects = SoupManager()
 
     def get_url_domain(self):
         return urlparse(self.url).netloc
 
     def get_absolute_url(self):
-        return reverse("fakenews:soup-detail", kwargs={"id": self.id})   
+        return reverse("fakenews:soup-detail", kwargs={"id": self.id})
 
     def get_update_url(self):
         return reverse("fakenews:soup-update", kwargs={"id": self.id})
@@ -97,6 +100,7 @@ class Soup(FakeNews):
     def get_download_posts_url(self):
         return reverse("fakenews:post-download", kwargs={"id": self.id})
 
+
 ##### POSTS #######
 class PostManager(models.Manager):
 
@@ -110,7 +114,7 @@ class PostManager(models.Manager):
             link=link,
             title=title,
             content=content,
-            )
+        )
         post.save()
         return post
 
@@ -120,14 +124,15 @@ class PostManager(models.Manager):
             link=link,
             title=title,
             content=content,
-            )
+        )
+
 
 class Post(models.Model):
-    link        = models.CharField(max_length=120, unique=True)
-    date        = models.CharField(max_length=120) #max_lenght = required
-    title       = models.CharField(max_length=120, default='')
-    content     = models.TextField()
-    objects     = PostManager()
+    link = models.CharField(max_length=120, unique=True)
+    date = models.CharField(max_length=120)  # max_lenght = required
+    title = models.CharField(max_length=120, default='')
+    content = models.TextField()
+    objects = PostManager()
 
     def get_absolute_url(self):
         return reverse("fakenews:wordpress-detail", kwargs={"id": self.id})

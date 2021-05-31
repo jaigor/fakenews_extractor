@@ -1,6 +1,9 @@
-from django.http import HttpResponse
+import csv
+import os
 from tempfile import NamedTemporaryFile
-import os, csv
+
+from django.http import HttpResponse
+
 
 class CsvDownloader:
 
@@ -11,13 +14,13 @@ class CsvDownloader:
             with open(filename, 'a', encoding="utf-8", newline='') as csvfile:
                 response = self._generate_csv_response(filename)
                 csvwriter = csv.writer(response)
-                
+
                 # csv header
                 csvwriter.writerow(['date', 'link', 'title', 'content'])
                 for post in posts:
                     csvwriter.writerow(post)
-                    csvfile.flush()                    
-                
+                    csvfile.flush()
+
                 return response
         finally:
             print("Info: Closing and deleting file")

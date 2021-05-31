@@ -6,22 +6,25 @@ import json
 
 from fakenews.csvDownloader import CsvDownloader
 
+
 class NoOKResponseError(Exception):
     pass
+
 
 class TooManyRequestError(Exception):
     pass
 
+
 class WordpressAPI(CsvDownloader):
 
     def __init__(
-        self, 
-        basepath
+            self,
+            basepath
     ):
         with open("wordpress/config.json", "r") as f:
             _keys = json.load(f)
             # constants
-            self._endpoint = _keys["endpoint"] # API Endpoint for Wordpress
+            self._endpoint = _keys["endpoint"]  # API Endpoint for Wordpress
             self._route = _keys["route"]
             self._pageINIT = _keys["pageINIT"]
             # limitation to not overload server
@@ -30,7 +33,7 @@ class WordpressAPI(CsvDownloader):
             self._pageMAX = _keys["pageMAX"]
             self._TimeBetweenReq = _keys["TimeBetweenReq"]
 
-            self._querystring = "?per_page=" + str(self._per_page) +"&page="
+            self._querystring = "?per_page=" + str(self._per_page) + "&page="
             self._basepath = basepath + self._endpoint
 
     def get_posts_types(self):
@@ -46,9 +49,9 @@ class WordpressAPI(CsvDownloader):
                     type_url = data[key]['_links']['wp:items'][0]['href']
                     if not type_url.endswith('/'):
                         type_url += '/'
-                        
+
                     types[post_type] = type_url
-                
+
                 return types
             else:
                 error_msg = (
@@ -56,14 +59,14 @@ class WordpressAPI(CsvDownloader):
                     'No se encuentra la url {} '
                 ).format(url)
                 raise TooManyRequestError(_(error_msg))
-        except (requests.exceptions.ConnectionError, 
+        except (requests.exceptions.ConnectionError,
                 requests.exceptions.MissingSchema):
             error_msg = (
                 'Error de Conexión. \n'
                 'Respuesta no encontrada para la url {} '
             ).format(url)
             raise NoOKResponseError(_(error_msg))
-        except (requests.exceptions.TooManyRedirects):
+        except requests.exceptions.TooManyRedirects:
             error_msg = (
                 'Error de Conexión. \n'
                 'Demasiadas peticiones para la url {} '
@@ -90,7 +93,7 @@ class WordpressAPI(CsvDownloader):
             page += 1
             time.sleep(self._TimeBetweenReq)
             r = requests.get(url + self._querystring + str(page))
-        
+
         return posts
 
     def _get_post_fields(self, post):
@@ -99,7 +102,7 @@ class WordpressAPI(CsvDownloader):
             date = post['date']
             link = post['link']
             title = post['title']['rendered']
-            content = post['content']['rendered']            
+            content = post['content']['rendered']
             return [date, link, title, content]
 
         except KeyError as err:

@@ -8,18 +8,18 @@ from django.http import JsonResponse
 from django.http import HttpResponseRedirect
 from django.views.generic.base import TemplateView
 
-from .base_views import(
+from .base_views import (
     FakeNewsCreateView,
     FakeNewsUpdateView,
     FakeNewsDetailView,
     FakeNewsDeleteView,
     FakeNewsListView,
     PostCreateView,
-    PostListView  
+    PostListView
 )
 
 from .forms import (
-    WordpressCreateForm, 
+    WordpressCreateForm,
     WordpressUpdateForm,
     SoupCreateForm
 )
@@ -29,11 +29,12 @@ from .models import (
 )
 from .base_services import ResponseHandlerError
 from .services import (
-    WordpressResponseHandler, 
+    WordpressResponseHandler,
     PostsResponseHandler,
-    SoupResponseHandler    
+    SoupResponseHandler
 )
 from .tasks import create_task
+
 
 @csrf_exempt
 def run_task(request):
@@ -42,10 +43,12 @@ def run_task(request):
         task = create_task.delay(int(task_type))
         return JsonResponse({"task_id": task.id}, status=202)
 
+
 class IndexView(TemplateView):
     template_name = 'index.html'
 
-##################### WORDPRESS #####################
+
+# WORDPRESS #
 class WordpressCreateView(FakeNewsCreateView):
     template_name = 'wordpress/wordpress-create.html'
     form_class = WordpressCreateForm
@@ -60,11 +63,12 @@ class WordpressCreateView(FakeNewsCreateView):
         except ResponseHandlerError as err:
             form.add_error('url', str(err))
 
+
 class WordpressUpdateView(FakeNewsUpdateView):
     template_name = 'wordpress/wordpress-update.html'
     form_class = WordpressUpdateForm
     model = Wordpress
-        
+
     def _run_handler(self, form):
         handler = WordpressResponseHandler(
             form.cleaned_data['url']
@@ -75,9 +79,11 @@ class WordpressUpdateView(FakeNewsUpdateView):
         except ResponseHandlerError as err:
             form.add_error('url', str(err))
 
+
 class WordpressDetailView(FakeNewsDetailView):
     template_name = 'wordpress/wordpress-detail.html'
-            
+
+
 class WordpressDeleteView(FakeNewsDeleteView):
     template_name = 'wordpress/wordpress-delete.html'
     model = Wordpress
@@ -85,24 +91,25 @@ class WordpressDeleteView(FakeNewsDeleteView):
     def get_success_url(self):
         return reverse('fakenews:wordpress-create')
 
+
 class WordpressListView(FakeNewsListView):
     template_name = 'wordpress/wordpress-list.html'
     model = Wordpress
     context_object_name = 'wordpress'
-    
-    def get_context_data(self,**kwargs):
+
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['create_url'] = reverse('fakenews:wordpress-create')
         return context
 
-        ############## POST ##############
 
+# POST #
 class WordpressPostCreateView(PostCreateView):
     template_name = 'wordpress/post-list.html'
     error_template_name = 'wordpress/wordpress-error.html'
     model = Wordpress
 
-    def _run_handler(self, request, obj): 
+    def _run_handler(self, request, obj):
         try:
             # get the input and delegate to process
             handler = WordpressResponseHandler(
@@ -111,19 +118,20 @@ class WordpressPostCreateView(PostCreateView):
             handler.handle_download_response()
             return HttpResponseRedirect(
                 reverse('fakenews:wordpress-post-list', kwargs={'id': obj.id})
-                )
+            )
         except ResponseHandlerError as err:
             context = {
                 'message': str(err)
             }
             return render(request, self.error_template_name, context)
 
+
 class WordpressPostDownloadView(PostCreateView):
     template_name = 'wordpress/post-list.html'
     error_template_name = 'wordpress/wordpress-error.html'
     model = Wordpress
 
-    def _run_handler(self, request, obj): 
+    def _run_handler(self, request, obj):
         try:
             # get the input and delegate to process
             handler = PostsResponseHandler(
@@ -137,8 +145,9 @@ class WordpressPostDownloadView(PostCreateView):
             }
             return render(request, self.error_template_name, context)
 
+
 class WordpressPostListView(PostListView):
-    template_name = 'wordpress/post-list.html'  
+    template_name = 'wordpress/post-list.html'
 
     def get_queryset(self):
         handler = WordpressResponseHandler()
@@ -158,7 +167,7 @@ class WordpressPostListView(PostListView):
         return context
 
 
-##################### SOUP ######################
+# SOUP #
 class SoupCreateView(FakeNewsCreateView):
     template_name = 'soups/soup-create.html'
     form_class = SoupCreateForm
@@ -176,6 +185,7 @@ class SoupCreateView(FakeNewsCreateView):
         except ResponseHandlerError as err:
             form.add_error('url', str(err))
 
+
 class SoupUpdateView(FakeNewsUpdateView):
     template_name = 'soups/soup-update.html'
     form_class = SoupCreateForm
@@ -191,29 +201,32 @@ class SoupUpdateView(FakeNewsUpdateView):
         except ResponseHandlerError as err:
             form.add_error('url', str(err))
 
+
 class SoupDetailView(FakeNewsDetailView):
     template_name = 'soups/soup-detail.html'
 
+
 class SoupDeleteView(FakeNewsDeleteView):
-    template_name = 'soups/soup-delete.html'    
+    template_name = 'soups/soup-delete.html'
     model = Soup
 
     def get_success_url(self):
         return reverse('fakenews:soup-create')
+
 
 class SoupListView(FakeNewsListView):
     template_name = 'soups/soup-list.html'
     model = Soup
     context_object_name = 'soups'
 
-        ############## POST ##############
 
+# POST #
 class SoupPostCreateView(PostCreateView):
     template_name = 'soups/post-list.html'
     error_template_name = 'soups/soup-error.html'
     model = Soup
 
-    def _run_handler(self, request, obj): 
+    def _run_handler(self, request, obj):
         try:
             # get the input and delegate to process
             handler = SoupResponseHandler(
@@ -230,12 +243,13 @@ class SoupPostCreateView(PostCreateView):
             }
             return render(request, self.error_template_name, context)
 
+
 class SoupPostDownloadView(PostCreateView):
     template_name = 'soups/post-list.html'
     error_template_name = 'soups/soup-error.html'
     model = Soup
 
-    def _run_handler(self, request, obj): 
+    def _run_handler(self, request, obj):
         try:
             # get the input and delegate to process
             handler = SoupResponseHandler(
@@ -248,8 +262,9 @@ class SoupPostDownloadView(PostCreateView):
             }
             return render(request, self.error_template_name, context)
 
+
 class SoupPostListView(PostListView):
-    template_name = 'soups/post-list.html'  
+    template_name = 'soups/post-list.html'
 
     def get_queryset(self):
         handler = SoupResponseHandler()

@@ -20,13 +20,14 @@ from .services import (
     ResponseHandlerError
 )
 
+
 class QueryCreateView(CreateView):
     template_name = 'twitters/query-create.html'
     form_class = QueryCreateForm
 
     def get_success_url(self):
         return '/'
-    
+
     def form_valid(self, form):
         return super().form_valid(form)
 
@@ -35,9 +36,9 @@ class QueryCreateView(CreateView):
         form = QueryCreateForm()
         context = {
             'form': form
-            }
+        }
         return render(request, self.template_name, context)
-        
+
     # POST Method
     def post(self, request, *args, **kwargs):
         form = QueryCreateForm(request.POST or None)
@@ -65,6 +66,7 @@ class QueryCreateView(CreateView):
         except ResponseHandlerError as err:
             form.add_error('query', str(err))
 
+
 class QueryUpdateView(UpdateView):
     template_name = 'twitters/query-update.html'
     form_class = QueryCreateForm
@@ -72,7 +74,7 @@ class QueryUpdateView(UpdateView):
 
     def get_success_url(self):
         return '/'
-    
+
     def form_valid(self, form):
         return super().form_valid(form)
 
@@ -100,14 +102,14 @@ class QueryUpdateView(UpdateView):
             self._run_handler(form)
             context = {
                 'form': form
-            }            
+            }
             return render(request, self.template_name, context)
         else:
             context = {
                 'form': form
             }
             return render(request, self.template_name, context)
-        
+
     def _run_handler(self, form):
         handler = ResponseHandler(
             form.cleaned_data['query']
@@ -117,6 +119,7 @@ class QueryUpdateView(UpdateView):
             handler.handle_update_response()
         except ResponseHandlerError as err:
             form.add_error('query', str(err))
+
 
 class QueryDetailView(DetailView):
     template_name = 'twitters/query-detail.html'
@@ -133,8 +136,9 @@ class QueryDetailView(DetailView):
         obj = self.get_object()
         context = {
             'object': obj
-            }
+        }
         return render(request, self.template_name, context)
+
 
 class QueryDeleteView(DeleteView):
     template_name = 'twitters/query-delete.html'
@@ -142,13 +146,14 @@ class QueryDeleteView(DeleteView):
 
     def get_success_url(self):
         return reverse('twitter:query-create')
-    
-    def form_valid(self, form):        
+
+    def form_valid(self, form):
         return super().form_valid(form)
 
     def get_object(self):
         id_ = self.kwargs.get("id")
         return get_object_or_404(Query, id=id_)
+
 
 class QueryListView(ListView):
     template_name = 'twitters/query-list.html'
@@ -158,7 +163,8 @@ class QueryListView(ListView):
     queryset = Query.objects.all()
     ordering = ['-id']
 
-####### TWEET ###########
+
+# TWEET #
 class TweetCreateView(DetailView):
     template_name = 'twitters/tweet-list.html'
     error_template_name = 'twitters/twitter-error.html'
@@ -184,11 +190,12 @@ class TweetCreateView(DetailView):
             }
             return render(request, self.error_template_name, context)
 
-    def _run_handler(self, obj):        
+    def _run_handler(self, obj):
         handler = ResponseHandler(
             obj.text
         )
         handler.handle_update_response()
+
 
 class TweetDownloadView(DetailView):
     template_name = 'twitters/tweet-list.html'
@@ -220,6 +227,7 @@ class TweetDownloadView(DetailView):
         )
         return handler.handle_download_response()
 
+
 class TweetListView(ListView):
     template_name = 'twitters/tweet-list.html'
     paginate_by = 10  # if pagination is desired
@@ -236,7 +244,7 @@ class TweetListView(ListView):
         handler = ResponseHandler(
             obj.text
         )
-        queryset = handler.get_tweet_queryset()        
+        queryset = handler.get_tweet_queryset()
 
         ordering = self.get_ordering()
         if ordering:
@@ -251,7 +259,8 @@ class TweetListView(ListView):
         context['query'] = Query.objects.find_by_id(self.kwargs.get("id")).get()
         return context
 
-#### USERS ######
+
+# USERS #
 class UserListView(ListView):
     template_name = 'twitters/user-list.html'
     paginate_by = 10  # if pagination is desired
@@ -269,7 +278,7 @@ class UserListView(ListView):
             obj.text
         )
         # get users and add to context (ahora coge tweets)
-        queryset = handler.get_user_queryset()        
+        queryset = handler.get_user_queryset()
 
         ordering = self.get_ordering()
         if ordering:
@@ -281,5 +290,5 @@ class UserListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['query'] = Query.objects.find_by_id(self.kwargs.get("id")).get()        
+        context['query'] = Query.objects.find_by_id(self.kwargs.get("id")).get()
         return context

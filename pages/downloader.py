@@ -2,9 +2,8 @@ from django.http import HttpResponse
 
 from tempfile import NamedTemporaryFile
 import os
-import time
 import csv
-import json
+
 
 class Downloader:
 
@@ -23,7 +22,7 @@ class Downloader:
                 csvwriter.writerow(headers)
                 for obj in objects:
                     csvwriter.writerow(obj)
-                
+
                 return response
         finally:
             print("closing and deleting file")

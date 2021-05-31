@@ -1,29 +1,37 @@
 from django.utils.translation import gettext as _
 from urllib.parse import urlparse
 
-from .wordpress import  WordpressAPI
+from .wordpress import WordpressAPI
 from .scrapper import Scrapper
 
 from .models import Wordpress, Soup
-from .base_services import(
-    FakeNewsRegister, 
+from .base_services import (
+    FakeNewsRegister,
     FakeNewsResponseHandler,
     PostsResponseHandler,
     FakeNewsAlreadyExistError,
     FakeNewsDoesNotExistError
 )
+
+
 # Custom Exceptions
 class WordpressAlreadyExistError(Exception):
     pass
+
+
 class WordpressDoesNotExistError(Exception):
     pass
+
+
 class PostAlreadyExistError(Exception):
     pass
+
+
 class PostDoesNotExistError(Exception):
     pass
 
-####### Wordpress #######
 
+# Wordpress #
 class WordpressResponseHandler(FakeNewsResponseHandler):
 
     def get_queryset(self, id):
@@ -56,7 +64,7 @@ class WordpressResponseHandler(FakeNewsResponseHandler):
     ###
     def _register_response(self, is_update):
 
-        if (is_update):
+        if is_update:
             # get soup
             wordpress = self._get_wordpress()
 
@@ -72,7 +80,7 @@ class WordpressResponseHandler(FakeNewsResponseHandler):
             # if no failure, register wordpress
             for k, v in types.items():
                 # register wordpress
-                wordpress = self._register_new_wordpress(v,k)
+                wordpress = self._register_new_wordpress(v, k)
 
                 posts = self._get_external_posts(v)
                 # register posts
@@ -94,7 +102,7 @@ class WordpressResponseHandler(FakeNewsResponseHandler):
     def _get_wordpress(self):
         fakenews_qs = Wordpress.objects.find_by_url(self._url)
         if not fakenews_qs.exists():
-            # Raise a meaningful error to be catched by the client
+            # Raise a meaningful error to be cached by the client
             error_msg = (
                 'No existe un Wordpress con esta url {} '
                 'Por favor, pruebe otra consulta'
@@ -113,12 +121,13 @@ class WordpressResponseHandler(FakeNewsResponseHandler):
         w = self._get_fakenews()
         return Wordpress.objects.get_posts(w.id)
 
+
 class WordpressRegister(FakeNewsRegister):
 
     def __init__(
-        self,
-        url,
-        post_type=None
+            self,
+            url,
+            post_type=None
     ):
         self._url = url
         self._post_type = post_type
@@ -129,30 +138,33 @@ class WordpressRegister(FakeNewsRegister):
             url=self._url,
             post_type=self._post_type,
             domain=self._domain,
-            )
+        )
 
     def update_fakenews(self):
         return Wordpress.objects.update_wordpress(
             url=self.url,
             post_type=self._post_type,
             domain=self._domain,
-            )
+        )
 
-####### Soup #######
 
+# Soup #
 class SoupDoesNotExistError(Exception):
     pass
+
+
 class SoupAlreadyExistError(Exception):
     pass
+
 
 class SoupResponseHandler(FakeNewsResponseHandler):
 
     def __init__(
-        self,
-        url=None,
-        link_class=None,
-        date_type=None,
-        date_id=None
+            self,
+            url=None,
+            link_class=None,
+            date_type=None,
+            date_id=None
     ):
         self._url = url
         self._link_class = link_class
@@ -166,19 +178,19 @@ class SoupResponseHandler(FakeNewsResponseHandler):
             raise FakeNewsDoesNotExistError(_(str(err)))
 
     def _handle(self):
-        try:            
+        try:
             self._register_response(False)
         except SoupAlreadyExistError as err:
             raise FakeNewsAlreadyExistError(_(str(err)))
 
-    def _update(self):        
-        try:            
+    def _update(self):
+        try:
             self._register_response(True)
         except SoupDoesNotExistError as err:
             raise FakeNewsDoesNotExistError(_(str(err)))
 
     def _download(self):
-        try:            
+        try:
             posts = self._get_internal_posts()
             filename = urlparse(self._url).netloc + '.csv'
 
@@ -191,10 +203,10 @@ class SoupResponseHandler(FakeNewsResponseHandler):
         # get all links
         links = self._get_external_links()
         # if no failure, register soup
-        if (is_update):
+        if is_update:
             # get soup
             soup = self._get_fakenews()
-        else:            
+        else:
             soup = self._register_new_soup()
 
         # register links
@@ -215,16 +227,16 @@ class SoupResponseHandler(FakeNewsResponseHandler):
         return soup.execute()
 
     def _get_external_links(self):
-        scrapper = Scrapper(self._url, 
-                        self._link_class, 
-                        self._date_type, 
-                        self._date_id)
+        scrapper = Scrapper(self._url,
+                            self._link_class,
+                            self._date_type,
+                            self._date_id)
         return scrapper.get_collection()
 
-    def _get_external_posts(self, links):            
-        scrapper = Scrapper(self._url, 
-                            self._link_class, 
-                            self._date_type, 
+    def _get_external_posts(self, links):
+        scrapper = Scrapper(self._url,
+                            self._link_class,
+                            self._date_type,
                             self._date_id)
 
         return scrapper.get_posts_content(links)
@@ -238,11 +250,11 @@ class SoupResponseHandler(FakeNewsResponseHandler):
 class SoupRegister(FakeNewsRegister):
 
     def __init__(
-        self,
-        url,
-        link_class,
-        date_type,
-        date_id
+            self,
+            url,
+            link_class,
+            date_type,
+            date_id
     ):
         self._url = url
         self._link_class = link_class
@@ -254,7 +266,7 @@ class SoupRegister(FakeNewsRegister):
             self._url,
             self._link_class,
             self._date_type,
-            self._date_id, 
+            self._date_id,
         )
 
     def update_fakenews(self):
@@ -262,5 +274,5 @@ class SoupRegister(FakeNewsRegister):
             self._url,
             self._link_class,
             self._date_type,
-            self._date_id, 
+            self._date_id,
         )

@@ -7,23 +7,31 @@ import json
 
 from fakenews.csvDownloader import CsvDownloader
 
+
 class NoSoupTypeError(Exception):
     pass
+
+
 class NoLinksFoundError(Exception):
     pass
+
+
 class NoOKResponseError(Exception):
     pass
+
+
 class TooManyRequestError(Exception):
     pass
+
 
 class Scrapper(CsvDownloader):
 
     def __init__(
-        self,
-        basepath,
-        linkClass=None,
-        dateType=None,
-        dateId=None
+            self,
+            basepath,
+            linkClass=None,
+            dateType=None,
+            dateId=None
     ):
         with open("soup/config.json", "r") as f:
             _keys = json.load(f)
@@ -35,7 +43,7 @@ class Scrapper(CsvDownloader):
             self._linkClass = linkClass
             self._dateType = dateType
             self._dateId = dateId
-    
+
     def get_collection(self):
         links = []
         # collection (from 0 or 1 to N)
@@ -43,18 +51,18 @@ class Scrapper(CsvDownloader):
         try:
             r0 = requests.get(self._basepath + str(page))
             # 0 can be throw error, so test it for results
-            if r0.status_code == 200: # success
+            if r0.status_code == 200:  # success
                 links = self._add_links(r0.content, links)
 
             # and continue with 1
-            page = 1    
+            page = 1
             r1 = requests.get(self._basepath + str(page))
 
             # no pages found
-            if (r0.status_code != 200 and r1.status_code != 200):
+            if r0.status_code != 200 and r1.status_code != 200:
                 error_msg = (
-                'Error de Página. \n'
-                'No se han encontrado páginas para la url {} '
+                    'Error de Página. \n'
+                    'No se han encontrado páginas para la url {} '
                 ).format(self._basepath)
                 raise NoSoupTypeError(_(error_msg))
             else:
@@ -74,7 +82,7 @@ class Scrapper(CsvDownloader):
             raise NoOKResponseError(_(error_msg))
 
         # no links found
-        if ( len(links) == 0):
+        if len(links) == 0:
             error_msg = (
                 'Error en los enlaces. \n'
                 'No se encuentran enlaces para la clase {} '
@@ -82,7 +90,7 @@ class Scrapper(CsvDownloader):
             raise NoLinksFoundError(_(error_msg))
 
         return links
-    
+
     def get_posts_content(self, links):
         try:
             posts = []
@@ -111,8 +119,8 @@ class Scrapper(CsvDownloader):
         # add all links to previous list
         divs = soup.find_all('div', class_=self._linkClass)
         for div in divs:
-            # didnt find link
-            if div.a != None: 
+            # didn't find link
+            if div.a is not None:
                 links.append(domain + div.a['href'])
         return links
 
@@ -122,11 +130,11 @@ class Scrapper(CsvDownloader):
         h2 = soup.find_all('h2')
         header = soup.find_all('header')
 
-        if (len(h1) > 0):
+        if len(h1) > 0:
             return h1[0].get_text()
-        elif (len(h2) > 0):
+        elif len(h2) > 0:
             return h2[0].get_text()
-        elif (len(header) > 0):
+        elif len(header) > 0:
             return header[0].get_text()
         else:
             print('Internal Error: no title found')
@@ -142,11 +150,11 @@ class Scrapper(CsvDownloader):
                 max = len(divs[i])
         return body.get_text()
 
-    def _get_date(self, soup):  
+    def _get_date(self, soup):
         html = ""
-        if self._dateType == "1":      #ID
+        if self._dateType == "1":  # ID
             html = soup.find(id=self._dateId).get_text()
-        elif self._dateType == "2":    #CLASS
+        elif self._dateType == "2":  # CLASS
             html = soup.find(class_=self._dateId).get_text()
         else:
             print('Internal Error: dateType not found')

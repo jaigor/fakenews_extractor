@@ -7,11 +7,15 @@ import os
 import csv
 import json
 
+
 # Custom Exceptions
 class TweetsRequestError(Exception):
     pass
+
+
 class UserRequestError(Exception):
     pass
+
 
 # Base Class
 class TwitterAPI:
@@ -28,20 +32,20 @@ class TwitterAPI:
             with open(filename, 'a', encoding="utf-8", newline='') as csvfile:
                 response = self._generate_csv_response(filename)
                 csvwriter = csv.writer(response)
-                
+
                 # csv header
                 csvwriter.writerow(headers)
                 for obj in objects:
                     csvwriter.writerow(obj)
                     csvfile.flush()
-                
+
                 return response
         finally:
             print("Info: Closing and deleting file")
             csvfile.close()
             os.unlink(csvfile.name)
 
-    # To set your enviornment variables in your terminal run the following line:
+    # To set your envionment variables in your terminal run the following line:
     # export 'BEARER_TOKEN'='<your_bearer_token>'
 
     def _auth(self):
@@ -65,17 +69,18 @@ class TwitterAPI:
                 )
             )
         return response.json()
-    
+
     def _generate_csv_response(self, filename):
         response = HttpResponse(content_type="text/csv")
         response['Content-Disposition'] = 'attachment; filename=' + filename
         return response
 
+
 class TweetLookup(TwitterAPI):
 
     def __init__(
-        self,
-        query
+            self,
+            query
     ):
         super().__init__()
         self._query = query
@@ -100,7 +105,7 @@ class TweetLookup(TwitterAPI):
         try:
             url = self._create_tweet_url()
             json_response = self._connect_to_endpoint(url)
-            #print(json.dumps(json_response, indent=4, sort_keys=True))
+            # print(json.dumps(json_response, indent=4, sort_keys=True))
             return json_response['data']
 
         except requests.exceptions.RequestException as err:
@@ -109,12 +114,13 @@ class TweetLookup(TwitterAPI):
                 'Por favor, pruebe otra consulta'
             )
             raise TweetsRequestError(_(error_msg))
-        
+
+
 class UserLookup(TwitterAPI):
 
     def __init__(
-        self,
-        author_id
+            self,
+            author_id
     ):
         super().__init__()
         self._author_id = author_id
@@ -122,24 +128,24 @@ class UserLookup(TwitterAPI):
     def _create_user_url(self):
         # Specify the usernames that you want to lookup below
         # You can enter up to 100 comma-separated values.
-        #usernames = "usernames=TwitterDev,TwitterAPI"
+        # usernames = "usernames=TwitterDev,TwitterAPI"
         user_fields = "user.fields={}".format(
             self._keys["user_fields"]
-            )
+        )
         # User fields are adjustable, options include:
         # created_at, description, entities, id, location, name,
         # pinned_tweet_id, profile_image_url, protected,
         # public_metrics, url, username, verified, and withheld
         url = "https://api.twitter.com/2/users/{}?{}".format(
             self._author_id, user_fields
-            )
+        )
         return url
 
     def search_user(self):
         try:
-            url = self._create_user_url()        
+            url = self._create_user_url()
             json_response = self._connect_to_endpoint(url)
-            #print(json.dumps(json_response, indent=4, sort_keys=True))
+            # print(json.dumps(json_response, indent=4, sort_keys=True))
             return json_response['data']
 
         except requests.exceptions.RequestException as err:
@@ -147,4 +153,4 @@ class UserLookup(TwitterAPI):
                 'No se ha encontrado un Usuario de Twitter válido'
                 'Por favor, pruebe otra consulta'
             )
-            raise UserRequestError(_(error_msg))       
+            raise UserRequestError(_(error_msg))

@@ -8,15 +8,19 @@ from .services import (
     ResponseHandlerError
 )
 
+
 # Create your views here.
 class HomeView(TemplateView):
     template_name = 'home.html'
 
+
 class AboutView(TemplateView):
     template_name = 'about.html'
 
+
 class CsvView(TemplateView):
     template_name = 'download.html'
+
 
 class DownloadPostsView(TemplateView):
     template_name = 'download.html'
@@ -38,6 +42,7 @@ class DownloadPostsView(TemplateView):
         handler = DownloadResponseHandler(
         )
         return handler.handle_all_posts_response()
+
 
 class DownloadUsersView(TemplateView):
     template_name = 'download.html'

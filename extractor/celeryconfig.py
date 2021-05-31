@@ -1,6 +1,5 @@
-broker_url = 'amqp://guest:guest@localhost:15672
-
-#result_backend = 'db+sqlite:///results.db'
+broker_url = 'amqp://guest:guest@localhost:15672'
+result_backend = 'db+postgresql+psycopg2://guest:guest@localhost/extractor'
 
 task_serializer = 'json'
 result_serializer = 'json'
