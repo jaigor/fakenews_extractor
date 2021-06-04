@@ -1,5 +1,5 @@
 from django.shortcuts import (
-    render, 
+    render,
     get_object_or_404
 )
 from django.views.generic import (
@@ -13,18 +13,20 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 
 from .forms import (
-    WordpressCreateForm, 
+    WordpressCreateForm,
     WordpressUpdateForm
 )
 from .models import (
-    Wordpress, 
+    Wordpress,
     Post
 )
 from .services import (
-    TypesResponseHandler, 
+    TypesResponseHandler,
     PostsResponseHandler,
     ResponseHandlerError
 )
+
+
 ############## WORDPRESS ##############
 class WordpressCreateView(CreateView):
     template_name = 'wordpress/wordpress-create.html'
@@ -32,7 +34,7 @@ class WordpressCreateView(CreateView):
 
     def get_success_url(self):
         return '/'
-    
+
     def form_valid(self, form):
         return super().form_valid(form)
 
@@ -41,9 +43,9 @@ class WordpressCreateView(CreateView):
         form = WordpressCreateForm()
         context = {
             'form': form
-            }
+        }
         return render(request, self.template_name, context)
-        
+
     # POST Method
     def post(self, request, *args, **kwargs):
         form = WordpressCreateForm(request.POST or None)
@@ -71,6 +73,7 @@ class WordpressCreateView(CreateView):
         except ResponseHandlerError as err:
             form.add_error('url', str(err))
 
+
 class WordpressUpdateView(UpdateView):
     template_name = 'wordpress/wordpress-update.html'
     form_class = WordpressUpdateForm
@@ -78,7 +81,7 @@ class WordpressUpdateView(UpdateView):
 
     def get_success_url(self):
         return '/'
-    
+
     def form_valid(self, form):
         return super().form_valid(form)
 
@@ -106,14 +109,14 @@ class WordpressUpdateView(UpdateView):
             self._run_handler(form)
             context = {
                 'form': form
-            }            
+            }
             return render(request, self.template_name, context)
         else:
             context = {
                 'form': form
             }
             return render(request, self.template_name, context)
-        
+
     def _run_handler(self, form):
         handler = TypesResponseHandler(
             form.cleaned_data['url']
@@ -123,6 +126,7 @@ class WordpressUpdateView(UpdateView):
             handler.handle_types_response()
         except ResponseHandlerError as err:
             form.add_error('url', str(err))
+
 
 class WordpressDetailView(DetailView):
     template_name = 'wordpress/wordpress-detail.html'
@@ -141,20 +145,22 @@ class WordpressDetailView(DetailView):
             'object': obj
         }
         return render(request, self.template_name, context)
-            
+
+
 class WordpressDeleteView(DeleteView):
     template_name = 'wordpress/wordpress-delete.html'
     model = Wordpress
 
     def get_success_url(self):
         return reverse('wordpress:wordpress-create')
-    
+
     def form_valid(self, form):
         return super().form_valid(form)
 
     def get_object(self):
         id_ = self.kwargs.get("id")
         return get_object_or_404(Wordpress, id=id_)
+
 
 class WordpressListView(ListView):
     template_name = 'wordpress/wordpress-list.html'
@@ -163,6 +169,7 @@ class WordpressListView(ListView):
     context_object_name = 'wordpress'
     queryset = Wordpress.objects.all()
     ordering = ['-id']
+
 
 ############## POST ##############
 
@@ -191,12 +198,13 @@ class PostCreateView(DetailView):
             }
             return render(request, self.error_template_name, context)
 
-    def _run_handler(self, obj):        
+    def _run_handler(self, obj):
         handler = PostsResponseHandler(
             obj.url,
             obj.id
         )
         handler.handle_post_response()
+
 
 class PostDownloadView(DetailView):
     template_name = 'wordpress/post-list.html'
@@ -229,12 +237,13 @@ class PostDownloadView(DetailView):
         )
         return handler.handle_download_response()
 
+
 class PostListView(ListView):
     template_name = 'wordpress/post-list.html'
     paginate_by = 10  # if pagination is desired
     model = Post
     context_object_name = 'posts'
-    ordering = ['-id']    
+    ordering = ['-id']
 
     def get_queryset(self):
         handler = PostsResponseHandler(

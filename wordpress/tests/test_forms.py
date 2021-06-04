@@ -1,5 +1,6 @@
 from django.test import TestCase
-from .forms import WordpressCreateForm, WordpressUpdateForm
+from wordpress.forms import WordpressCreateForm, WordpressUpdateForm
+
 
 class TestForms(TestCase):
 

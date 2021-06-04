@@ -37,6 +37,7 @@ urlpatterns = [
     path('csv/', CsvView.as_view(), name='csv'),
     path('downloadposts/', DownloadPostsView.as_view(), name='download-posts'),
     path('downloadusers/', DownloadUsersView.as_view(), name='download-users'),
+    path('celery-progress/', include('celery_progress.urls')),
     path('admin/', admin.site.urls),
 
 ]

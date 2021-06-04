@@ -8,7 +8,6 @@ from .views import (
     WordpressUpdateView,
     WordpressDeleteView,
     WordpressListView,
-    WordpressPostCreateView,
     WordpressPostDownloadView,
     WordpressPostListView,
 
@@ -33,8 +32,7 @@ urlpatterns = [
     path('wordpress/<int:id>/', WordpressDetailView.as_view(), name='wordpress-detail'),
     path('wordpress/<int:id>/update/', WordpressUpdateView.as_view(), name='wordpress-update'),
     path('wordpress/<int:id>/delete/', WordpressDeleteView.as_view(), name='wordpress-delete'),
-    path('wordpress/<int:id>/createposts/', WordpressPostCreateView.as_view(), name='wordpress-post-create'),
-    path('wordpress/<int:id>/updateposts/', WordpressPostDownloadView.as_view(), name='wordpress-post-update'),
+    path('wordpress/<int:id>/downloadposts/', WordpressPostDownloadView.as_view(), name='wordpress-post-download'),
     path('wordpress/<int:id>/listpost/', WordpressPostListView.as_view(), name='wordpress-post-list'),
 
     path('soup/', SoupListView.as_view(), name='soup-list'),

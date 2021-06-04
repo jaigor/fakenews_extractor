@@ -1,52 +1,53 @@
-
 from django.utils.translation import gettext as _
-from .wordpress import(
+from .wordpress import (
     NoOKResponseError,
     TooManyRequestError
 )
 
 from .models import FakeNews, Post
 
+
 # Custom Exceptions
 class ResponseHandlerError(Exception):
     pass
 
+
 class FakeNewsResponseHandler:
 
     def __init__(
-        self,
-        url=None
+            self,
+            url=None
     ):
         self._url = url
 
     def handle_response(self):
-        try:            
-            self._handle()
+        try:
+            return self._handle()
         except (
                 NoOKResponseError,
                 TooManyRequestError,
                 FakeNewsAlreadyExistError
-            ) as err:
+        ) as err:
             raise ResponseHandlerError(_(str(err)))
 
     def handle_update_response(self):
-        try:            
-            self._update()
+        try:
+            return self._update()
         except (
                 NoOKResponseError,
                 TooManyRequestError,
                 FakeNewsDoesNotExistError
-            ) as err:
+        ) as err:
             raise ResponseHandlerError(_(str(err)))
 
     def handle_download_response(self):
-        try:            
-            self._download()
+        try:
+            return self._download()
         except (
                 NoOKResponseError,
                 TooManyRequestError,
                 FakeNewsDoesNotExistError
-            ) as err:
+        ) as err:
             raise ResponseHandlerError(_(str(err)))
 
     def _get_fakenews(self):
@@ -62,20 +63,24 @@ class FakeNewsResponseHandler:
 
         return fakenews_qs.get()
 
+
 # Custom Exceptions
 class FakeNewsAlreadyExistError(Exception):
     pass
+
+
 class FakeNewsDoesNotExistError(Exception):
     pass
 
+
 class FakeNewsRegister:
-    
+
     def __init__(
-        self,
-        url
+            self,
+            url
     ):
         self._url = url
-    
+
     def execute(self):
         self.valid_data()
         fakenews = self._create_fakenews()
@@ -95,37 +100,39 @@ class FakeNewsRegister:
 
         return True
 
-##### POST #####
+
+# POST #
 # Custom Exceptions
 class PostAlreadyExistError(Exception):
     pass
 
+
 # PostResponse
 class PostsResponseHandler:
     def __init__(
-        self,
-        url = None,
-        fakenews_id = None
+            self,
+            url=None,
+            fakenews_id=None
     ):
         self._url = url
         self._fakenews_id = fakenews_id
-        
+
     def handle_post_response(self, fakenews, posts):
         try:
             for post in posts:
                 # register each post [date, link, title, content]
                 new_post = self._register_post(
-                                            post[0],
-                                            post[1],
-                                            post[2],
-                                            post[3])
+                    post[0],
+                    post[1],
+                    post[2],
+                    post[3])
                 # and add to fakenews
                 FakeNews.objects.add_post(fakenews, new_post)
         except (
                 NoOKResponseError,
-                TooManyRequestError,                
+                TooManyRequestError,
                 PostAlreadyExistError
-            ) as err:
+        ) as err:
             raise ResponseHandlerError(_(str(err)))
 
     def _get_fakenews(self):
@@ -154,16 +161,17 @@ class PostsResponseHandler:
             return Post.objects.find_by_link(link).get()
         # create
         else:
-            return register.execute()  
+            return register.execute()
+
 
 class PostRegister:
 
     def __init__(
-        self,
-        date,
-        link,
-        title,
-        content
+            self,
+            date,
+            link,
+            title,
+            content
     ):
         self._date = date
         self._link = link
@@ -195,12 +203,12 @@ class PostRegister:
             link=self._link,
             title=self._title,
             content=self._content,
-            )
+        )
 
     def update_post(self):
         self.valid_post()
         self._update_post()
-    
+
     def valid_post(self):
         post_qs = Post.objects.find_by_link(self._link)
         return post_qs.exists()
@@ -211,4 +219,4 @@ class PostRegister:
             link=self._link,
             title=self._title,
             content=self._content,
-            )
+        )

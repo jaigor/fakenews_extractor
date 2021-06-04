@@ -3,8 +3,8 @@ from django.test import TestCase
 from mock import patch
 import pytest
 
-from .models import Post, Wordpress
-from .services import (
+from wordpress.models import Post, Wordpress
+from wordpress.services import (
     PostsResponseHandler,
     ResponseHandlerError,
     PostRegister,
@@ -12,9 +12,10 @@ from .services import (
     WordpressDoesNotExistError
 )
 
+
 def create_post(link, date, title, content):
     # mock for "create_post" method on the PostRegister model
-    # to avoind touching the database.
+    # to avoid touching the database.
     return Post(
         link=link,
         date=date,
@@ -22,28 +23,28 @@ def create_post(link, date, title, content):
         content=content
     )
 
-class TestPostsResponseHandler(TestCase):
 
+class TestPostsResponseHandler(TestCase):
     posts = [["www.wordpress.com/posts/1",
-            "01/01/2021",
-            "Post",
-            "Post Content"],
-            ["www.wordpress.com/posts/2",
-            "01/01/2021",
-            "Post2",
-            "Post2 Content"]]
+              "01/01/2021",
+              "Post",
+              "Post Content"],
+             ["www.wordpress.com/posts/2",
+              "01/01/2021",
+              "Post2",
+              "Post2 Content"]]
 
     @patch.object(Wordpress.objects, 'find_by_id', return_value=MockSet())
     def test_when_wordpress_does_not_exist_raise_does_not_exist_error(self, mocked):
-
         with pytest.raises(WordpressDoesNotExistError):
             use_case = PostsResponseHandler(
                 url="www.wordpress.com/data"
             )
             use_case._get_wordpress()
 
-@patch.object(Post.objects, 'create_post', side_effect=create_post) # we don't need to test django again
-@patch.object(PostRegister, 'valid_data', return_value=None)        # already tested on TestValidData
+
+@patch.object(Post.objects, 'create_post', side_effect=create_post)  # we don't need to test django again
+@patch.object(PostRegister, 'valid_data', return_value=None)  # already tested on TestValidData
 class TestPostRegisterExecute(TestCase):
     # Test the execute method on PostRegister use case
 
@@ -70,8 +71,8 @@ class TestPostRegisterExecute(TestCase):
         post = self._use_case.execute()
         assert post.title == expected_result
 
-class TestValidData(TestCase):
 
+class TestValidData(TestCase):
     # Test the valid_data method on PostRegister use case
     qs_mock = MockSet(
         Post(
@@ -81,9 +82,9 @@ class TestValidData(TestCase):
             content="Post Content"
         )
     )
+
     @patch.object(Post.objects, 'find_by_link', return_value=qs_mock)
     def test_when_post_already_exists_raise_post_already_exist_error(self, mocked):
-
         with pytest.raises(PostAlreadyExistError):
             use_case = PostRegister(
                 "www.wordpress.com/posts/1",

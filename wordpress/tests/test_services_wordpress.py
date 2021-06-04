@@ -3,8 +3,8 @@ from django.test import TestCase
 from mock import patch
 import pytest
 
-from .models import Wordpress
-from .services import (
+from wordpress.models import Wordpress
+from wordpress.services import (
     TypesResponseHandler,
     ResponseHandlerError,
     WordpressRegister,
@@ -12,6 +12,7 @@ from .services import (
     NoOKResponseError,
     WordpressAlreadyExistError,
 )
+
 
 def create_wordpress(url, post_type, domain):
     # mock for "create_wordpress" method on the WordpressRegister model
@@ -22,19 +23,20 @@ def create_wordpress(url, post_type, domain):
         domain=domain
     )
 
+
 class TestTypesResponseHandler(TestCase):
 
     @patch.object(WordpressAPI, 'get_posts_types', side_effect=NoOKResponseError('error'))
     def test_when_wordpress_posts_not_found_raise_response_handler_error(self, mocked):
-
         with pytest.raises(ResponseHandlerError):
             use_case = TypesResponseHandler(
                 url="www.wordpress.com/data"
             )
             use_case.handle_types_response()
 
-@patch.object(Wordpress.objects, 'create_wordpress', side_effect=create_wordpress) # we don't need to test django again
-@patch.object(WordpressRegister, 'valid_data', return_value=None)   # already tested on TestValidData
+
+@patch.object(Wordpress.objects, 'create_wordpress', side_effect=create_wordpress)  # we don't need to test django again
+@patch.object(WordpressRegister, 'valid_data', return_value=None)  # already tested on TestValidData
 class TestPostRegisterExecute(TestCase):
     # Test the execute method on PostRegister use case
 
@@ -59,8 +61,8 @@ class TestPostRegisterExecute(TestCase):
         wordpress = self._use_case.execute()
         assert wordpress.post_type == expected_result
 
-class TestValidData(TestCase):
 
+class TestValidData(TestCase):
     # Test the valid_data method on WordpressRegister use case
     qs_mock = MockSet(
         Wordpress(
@@ -68,9 +70,9 @@ class TestValidData(TestCase):
             post_type="Pages"
         )
     )
+
     @patch.object(Wordpress.objects, 'find_by_url', return_value=qs_mock)
     def test_when_wordpress_already_exists_raise_wordpress_already_exist_error(self, mocked):
-
         with pytest.raises(WordpressAlreadyExistError):
             use_case = WordpressRegister(
                 url="www.wordpress.com/data",

@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 from .base_models import FakeNewsManager, FakeNews
 
 
-##### Wordpress type #######
+# Wordpress type #
 class WordpressManager(FakeNewsManager):
 
     def find_by_domain(self, domain):
@@ -46,16 +46,13 @@ class Wordpress(FakeNews):
         return reverse("fakenews:wordpress-delete", kwargs={"id": self.id})
 
     def get_posts_url(self):
-        return reverse("fakenews:post-list", kwargs={"id": self.id})
-
-    def get_update_posts_url(self):
-        return reverse("fakenews:post-update", kwargs={"id": self.id})
+        return reverse("fakenews:wordpress-post-list", kwargs={"id": self.id})
 
     def get_download_posts_url(self):
-        return reverse("fakenews:post-download", kwargs={"id": self.id})
+        return reverse("fakenews:wordpress-post-download", kwargs={"id": self.id})
 
 
-##### SOUP TYPE #######
+# SOUP TYPE #
 class SoupManager(FakeNewsManager):
 
     def create_soup(self, url, link_class, date_type, date_id):
@@ -101,7 +98,7 @@ class Soup(FakeNews):
         return reverse("fakenews:post-download", kwargs={"id": self.id})
 
 
-##### POSTS #######
+# POSTS #
 class PostManager(models.Manager):
 
     def find_by_link(self, link):
@@ -128,9 +125,9 @@ class PostManager(models.Manager):
 
 
 class Post(models.Model):
-    link = models.CharField(max_length=120, unique=True)
-    date = models.CharField(max_length=120)  # max_lenght = required
-    title = models.CharField(max_length=120, default='')
+    link = models.CharField(max_length=255, unique=True)
+    date = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, default='')
     content = models.TextField()
     objects = PostManager()
 

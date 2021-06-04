@@ -1,12 +1,12 @@
-from django.shortcuts import (
-    render
-)
 from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
 
 from django.http import HttpResponseRedirect
 from django.views.generic.base import TemplateView
+
+from django.shortcuts import (
+    render,
+    get_object_or_404
+)
 
 from .base_views import (
     FakeNewsCreateView,
@@ -33,15 +33,6 @@ from .services import (
     PostsResponseHandler,
     SoupResponseHandler
 )
-from .tasks import create_task
-
-
-@csrf_exempt
-def run_task(request):
-    if request.POST:
-        task_type = request.POST.get("type")
-        task = create_task.delay(int(task_type))
-        return JsonResponse({"task_id": task.id}, status=202)
 
 
 class IndexView(TemplateView):
@@ -59,7 +50,9 @@ class WordpressCreateView(FakeNewsCreateView):
         )
         # handle the output
         try:
-            handler.handle_response()
+            result = handler.handle_response()
+            self.context['task_id'] = result.task_id
+
         except ResponseHandlerError as err:
             form.add_error('url', str(err))
 
@@ -75,13 +68,19 @@ class WordpressUpdateView(FakeNewsUpdateView):
         )
         # handle the output
         try:
-            handler.handle_update_response()
+            result = handler.handle_update_response()
+            self.context['task_id'] = result.task_id
+
         except ResponseHandlerError as err:
             form.add_error('url', str(err))
 
 
 class WordpressDetailView(FakeNewsDetailView):
     template_name = 'wordpress/wordpress-detail.html'
+
+    def get_object(self):
+        id_ = self.kwargs.get("id")
+        return get_object_or_404(Wordpress, id=id_)
 
 
 class WordpressDeleteView(FakeNewsDeleteView):
@@ -91,20 +90,20 @@ class WordpressDeleteView(FakeNewsDeleteView):
     def get_success_url(self):
         return reverse('fakenews:wordpress-create')
 
+    def get_object(self):
+        id_ = self.kwargs.get("id")
+        return get_object_or_404(Wordpress, id=id_)
+
 
 class WordpressListView(FakeNewsListView):
     template_name = 'wordpress/wordpress-list.html'
     model = Wordpress
     context_object_name = 'wordpress'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['create_url'] = reverse('fakenews:wordpress-create')
-        return context
+    queryset = Wordpress.objects.all()
 
 
 # POST #
-class WordpressPostCreateView(PostCreateView):
+class WordpressPostDownloadView(PostCreateView):
     template_name = 'wordpress/post-list.html'
     error_template_name = 'wordpress/wordpress-error.html'
     model = Wordpress
@@ -114,29 +113,6 @@ class WordpressPostCreateView(PostCreateView):
             # get the input and delegate to process
             handler = WordpressResponseHandler(
                 obj.url
-            )
-            handler.handle_download_response()
-            return HttpResponseRedirect(
-                reverse('fakenews:wordpress-post-list', kwargs={'id': obj.id})
-            )
-        except ResponseHandlerError as err:
-            context = {
-                'message': str(err)
-            }
-            return render(request, self.error_template_name, context)
-
-
-class WordpressPostDownloadView(PostCreateView):
-    template_name = 'wordpress/post-list.html'
-    error_template_name = 'wordpress/wordpress-error.html'
-    model = Wordpress
-
-    def _run_handler(self, request, obj):
-        try:
-            # get the input and delegate to process
-            handler = PostsResponseHandler(
-                obj.url,
-                obj.id
             )
             return handler.handle_download_response()
         except ResponseHandlerError as err:

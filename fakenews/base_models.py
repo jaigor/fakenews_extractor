@@ -1,13 +1,14 @@
 from django.db import models
 
-##### FakeNews as Interface ####### 
+
+# FakeNews as Interface #
 class FakeNewsManager(models.Manager):
 
     def find_by_id(self, id):
         queryset = self.get_queryset()
         return queryset.filter(id=id)
 
-    def find_by_url(self, url):        
+    def find_by_url(self, url):
         queryset = self.get_queryset()
         print(url)
         return queryset.filter(url=url)
@@ -27,8 +28,8 @@ class FakeNewsManager(models.Manager):
 
         return posts
 
-class FakeNews(models.Model):
 
-    url     = models.CharField(max_length=120, unique=True) #max_lenght = required
-    posts   = models.ManyToManyField('Post', blank=True)
+class FakeNews(models.Model):
+    url = models.CharField(max_length=256, unique=True)  # max_lenght = required
+    posts = models.ManyToManyField('Post', blank=True)
     objects = FakeNewsManager()

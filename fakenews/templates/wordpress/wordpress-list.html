@@ -7,7 +7,7 @@
     <h1>Consultas</h1>
     <p>Websites que usan Wordpress que han sido correctamente registradas en la web.</p>
 
-    <p><a href={{ create_url }}>Crear nueva consulta <img src="{% static 'plus-square.svg' %}" alt="create" width="16" height="16"> </a></p>
+    <p><a href="/fakenews/wordpress/create">Crear nueva consulta <img src="{% static 'plus-square.svg' %}" alt="create" width="16" height="16"> </a></p>
 
     <hr class="my-4">
 
@@ -16,7 +16,7 @@
     <ul>
         {% for instance in wordpress %}
             <li> 
-                <a href={{ instance.get_absolute_url }}>{{ instance.get_url_domain }} - {{ instance.post_type }}</a> 
+                <a href={{ instance.get_absolute_url }}>{{ instance.get_url_domain }} - {{ instance.post_type }}</a>
                 <a href={{ instance.get_update_url }}> <img src="{% static 'pencil-square.svg' %}" alt="modify" width="16" height="16"> </a> 
                 <a href={{ instance.get_delete_url }}> <img src="{% static 'trash.svg' %}" alt="update" width="16" height="16"> </a>
             </li>

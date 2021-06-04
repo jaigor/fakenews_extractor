@@ -2,6 +2,7 @@
 
 {% block content %}
 {% include 'wordpress/wordpress-header.html' %}
+{% load static %}
 <div class="container">
     <h1>Descarga Wordpress</h1>
     <p>Explicacion pagina tipo wordpress</p>
@@ -13,9 +14,24 @@
         <div class="mb-3">
             {{ form }}
         </div>
-        <input type='submit' value='Crear' class="btn btn-primary" onclick="return fakeNewsTaskHandler();"/>
+        <input type='submit' value='Crear' class="btn btn-primary"/>
     </form>
-    <button class="eventButton">Lanza Tarea</button>
-    <hr class="my-4">
+
+    <div class='progress-wrapper'>
+      <div id='progress-bar' class='progress-bar' style="background-color: #68a9ef; width: 0%;">&nbsp;</div>
+    </div>
+    <div id="progress-bar-message"></div>
+    <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
+
+    {% if task_id %}
+    <script>
+        // vanilla JS version
+        document.addEventListener("DOMContentLoaded", function () {
+          var progressUrl = "{% url 'celery_progress:task_status' task_id %}";
+          CeleryProgressBar.initProgressBar(progressUrl);
+        });
+    </script>
+    {% endif %}
+
 </div>
 {% endblock %}
