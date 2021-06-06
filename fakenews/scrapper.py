@@ -33,7 +33,7 @@ class Scrapper(CsvDownloader):
             dateType=None,
             dateId=None
     ):
-        with open("soup/config.json", "r") as f:
+        with open("fakenews/config.json", "r") as f:
             _keys = json.load(f)
             # constants
             self._pageMAX = _keys["pageMAX"]

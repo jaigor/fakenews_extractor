@@ -10,7 +10,6 @@ class FakeNewsManager(models.Manager):
 
     def find_by_url(self, url):
         queryset = self.get_queryset()
-        print(url)
         return queryset.filter(url=url)
 
     def add_post(self, fakenews, post):

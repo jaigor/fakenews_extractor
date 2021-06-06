@@ -30,7 +30,6 @@ from .models import (
 from .base_services import ResponseHandlerError
 from .services import (
     WordpressResponseHandler,
-    PostsResponseHandler,
     SoupResponseHandler
 )
 
@@ -48,10 +47,9 @@ class WordpressCreateView(FakeNewsCreateView):
         handler = WordpressResponseHandler(
             form.cleaned_data['url']
         )
-        # handle the output
         try:
             result = handler.handle_response()
-            self.context['task_id'] = result.task_id
+            self.context['task_ids'] = [result, result.parent]
 
         except ResponseHandlerError as err:
             form.add_error('url', str(err))
@@ -69,7 +67,7 @@ class WordpressUpdateView(FakeNewsUpdateView):
         # handle the output
         try:
             result = handler.handle_update_response()
-            self.context['task_id'] = result.task_id
+            self.context['task_ids'] = [result, result.parent]
 
         except ResponseHandlerError as err:
             form.add_error('url', str(err))
@@ -157,7 +155,8 @@ class SoupCreateView(FakeNewsCreateView):
         )
         # handle the output
         try:
-            handler.handle_response()
+            result = handler.handle_response()
+            self.context['task_id'] = result.task_id
         except ResponseHandlerError as err:
             form.add_error('url', str(err))
 
@@ -194,6 +193,7 @@ class SoupListView(FakeNewsListView):
     template_name = 'soups/soup-list.html'
     model = Soup
     context_object_name = 'soups'
+    queryset = Soup.objects.all()
 
 
 # POST #

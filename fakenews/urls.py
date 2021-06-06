@@ -16,7 +16,6 @@ from .views import (
     SoupDetailView,
     SoupDeleteView,
     SoupListView,
-    SoupPostCreateView,
     SoupPostDownloadView,
     SoupPostListView,
 )
@@ -41,7 +40,6 @@ urlpatterns = [
     path('soup/<int:id>/', SoupDetailView.as_view(), name='soup-detail'),
     path('soup/<int:id>/update/', SoupUpdateView.as_view(), name='soup-update'),
     path('soup/<int:id>/delete/', SoupDeleteView.as_view(), name='soup-delete'),
-    path('soup/<int:id>/createposts/', SoupPostCreateView.as_view(), name='soup-post-create'),
     path('soup/<int:id>/updateposts/', SoupPostDownloadView.as_view(), name='soup-post-update'),
     path('soup/<int:id>/listpost/', SoupPostListView.as_view(), name='soup-post-list'),
 

@@ -21,7 +21,7 @@ class WordpressAPI(CsvDownloader):
             self,
             basepath
     ):
-        with open("wordpress/config.json", "r") as f:
+        with open("fakenews/config.json", "r") as f:
             _keys = json.load(f)
             # constants
             self._endpoint = _keys["endpoint"]  # API Endpoint for Wordpress

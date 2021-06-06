@@ -32,7 +32,7 @@ class FakeNewsCreateView(CreateView):
     # GET Method
     def get(self, request, *args, **kwargs):
         form = FakeNewsForm()
-        self.context['form'] = form
+        self.context = {'form': form}
 
         return render(request, self.template_name, self.context)
 
