@@ -2,7 +2,7 @@ from django.utils.translation import gettext as _
 from celery import shared_task
 from celery_progress.backend import ProgressRecorder
 
-
+from .scrapper import Scrapper
 from .wordpress import WordpressAPI
 from .base_services import (
     PostsResponseHandler,
@@ -10,16 +10,15 @@ from .base_services import (
 )
 from .models import Wordpress, Soup
 
-from .register import WordpressRegister
+from .register import (
+    WordpressRegister,
+    WordpressDoesNotExistError,
+    WordpressAlreadyExistError,
+    SoupRegister,
+    SoupDoesNotExistError,
+    SoupAlreadyExistError
+)
 from .base_services import FakeNewsAlreadyExistError
-
-
-class WordpressDoesNotExistError(Exception):
-    pass
-
-
-class WordpressAlreadyExistError(Exception):
-    pass
 
 
 @shared_task(bind=True, throws=(FakeNewsAlreadyExistError, WordpressAlreadyExistError),
@@ -56,9 +55,6 @@ def get_wordpress_urls(self, post_type_url, is_update):
              trail=True, name="register_wordpress_list_posts")
 def register_wordpress_list_posts(self, post_type_url_list):
     try:
-        if len(post_type_url_list) < 1:
-            return
-
         progress_recorder = ProgressRecorder(self)
         progress_recorder.set_progress(0, len(post_type_url_list))
 
@@ -111,19 +107,83 @@ def _register_new_wordpress(url, post_type):
 
 # Soup #
 
-@shared_task(bind=True, trail=True, name="register_new_soup_posts")
-def c_register_soup_posts(self, post_type_url):
-    progress_recorder = ProgressRecorder(self)
-    progress_recorder.set_progress(10, 100)
+@shared_task(bind=True,
+             throws=(FakeNewsAlreadyExistError, SoupAlreadyExistError, FakeNewsDoesNotExistError, SoupDoesNotExistError),
+             trail=True, name="register_new_soup_posts")
+def register_soup_posts(self, url, link_class, date_type, date_id, is_update):
+    try:
+        progress_recorder = ProgressRecorder(self)
+        progress_recorder.set_progress(0, 100)
 
-    api = WordpressAPI(post_type_url)
-    posts = api.get_posts_content(post_type_url)
-    progress_recorder.set_progress(60, 100)
+        # get all links
+        links = _get_external_links(url, link_class, date_type, date_id)
+        progress_recorder.set_progress(40, 100)
+        # if no failure, register soup
+        if is_update:
+            # get soup
+            soup = _get_soup(url)
+        else:
+            soup = _register_new_soup(url, link_class, date_type, date_id)
 
-    # register posts
-    # delegate on postresponsehandler
-    post_handler = PostsResponseHandler()
-    progress_recorder.set_progress(70, 100)
+        progress_recorder.set_progress(50, 100)
 
-    wordpress = _get_wordpress(post_type_url)
-    post_handler.handle_post_response(wordpress, posts)
+        # register links
+        posts = _get_external_posts(url, link_class, date_type, date_id, links)
+        progress_recorder.set_progress(80, 100)
+
+        # register posts
+        # delegate postresponsehandler
+        post_handler = PostsResponseHandler()
+        post_handler.handle_post_response(soup, posts)
+        progress_recorder.set_progress(100, 100)
+
+    except FakeNewsAlreadyExistError as err:
+        raise FakeNewsAlreadyExistError(_(str(err)))
+    except SoupAlreadyExistError as err:
+        raise SoupAlreadyExistError(_(str(err)))
+    except FakeNewsDoesNotExistError as err:
+        raise FakeNewsDoesNotExistError(_(str(err)))
+    except SoupDoesNotExistError as err:
+        raise SoupDoesNotExistError(_(str(err)))
+
+
+def _get_external_links(url, link_class, date_type, date_id):
+    scrapper = Scrapper(url,
+                        link_class,
+                        date_type,
+                        date_id)
+    return scrapper.get_collection()
+
+
+def _get_external_posts(url, link_class, date_type, date_id, links):
+    scrapper = Scrapper(url,
+                        link_class,
+                        date_type,
+                        date_id)
+
+    return scrapper.get_posts_content(links)
+
+
+def _get_soup(url):
+    fakenews_qs = Soup.objects.find_by_url(url)
+    if not fakenews_qs.exists():
+        # Raise a meaningful error to be cached by the client
+        error_msg = (
+            'No existe un Soup con esta url {} '
+            'Por favor, pruebe otra consulta'
+        ).format(url)
+
+        raise SoupDoesNotExistError(_(error_msg))
+
+    return fakenews_qs.get()
+
+
+def _register_new_soup(url, link_class, date_type, date_id):
+    soup = SoupRegister(
+        url=url,
+        link_class=link_class,
+        date_type=date_type,
+        date_id=date_id,
+    )
+    return soup.execute()
+

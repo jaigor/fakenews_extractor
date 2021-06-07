@@ -91,9 +91,6 @@ class Soup(FakeNews):
     def get_posts_url(self):
         return reverse("fakenews:post-list", kwargs={"id": self.id})
 
-    def get_update_posts_url(self):
-        return reverse("fakenews:post-update", kwargs={"id": self.id})
-
     def get_download_posts_url(self):
         return reverse("fakenews:post-download", kwargs={"id": self.id})
 

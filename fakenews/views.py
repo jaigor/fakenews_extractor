@@ -168,17 +168,25 @@ class SoupUpdateView(FakeNewsUpdateView):
 
     def _run_handler(self, form):
         handler = SoupResponseHandler(
-            form.cleaned_data['url']
+            form.cleaned_data['url'],
+            form.cleaned_data['link_class'],
+            form.cleaned_data['date_type'],
+            form.cleaned_data['date_id']
         )
         # handle the output
         try:
-            handler.handle_update_response()
+            result = handler.handle_update_response()
+            self.context['task_id'] = result.task_id
         except ResponseHandlerError as err:
             form.add_error('url', str(err))
 
 
 class SoupDetailView(FakeNewsDetailView):
     template_name = 'soups/soup-detail.html'
+
+    def get_object(self):
+        id_ = self.kwargs.get("id")
+        return get_object_or_404(Soup, id=id_)
 
 
 class SoupDeleteView(FakeNewsDeleteView):
@@ -187,6 +195,10 @@ class SoupDeleteView(FakeNewsDeleteView):
 
     def get_success_url(self):
         return reverse('fakenews:soup-create')
+
+    def get_object(self):
+        id_ = self.kwargs.get("id")
+        return get_object_or_404(Soup, id=id_)
 
 
 class SoupListView(FakeNewsListView):
@@ -197,29 +209,6 @@ class SoupListView(FakeNewsListView):
 
 
 # POST #
-class SoupPostCreateView(PostCreateView):
-    template_name = 'soups/post-list.html'
-    error_template_name = 'soups/soup-error.html'
-    model = Soup
-
-    def _run_handler(self, request, obj):
-        try:
-            # get the input and delegate to process
-            handler = SoupResponseHandler(
-                obj.url,
-                obj.link_class,
-                obj.date_type,
-                obj.date_id
-            )
-            handler.handle_update_response()
-            return HttpResponseRedirect(reverse('fakenews:post-list', kwargs={'id': obj.id}))
-        except ResponseHandlerError as err:
-            context = {
-                'message': str(err)
-            }
-            return render(request, self.error_template_name, context)
-
-
 class SoupPostDownloadView(PostCreateView):
     template_name = 'soups/post-list.html'
     error_template_name = 'soups/soup-error.html'

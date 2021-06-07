@@ -2,6 +2,7 @@
 
 {% block content %}
 {% include 'soups/soup-header.html' %}
+{% load static %}
 <div class="container">
     <h1>Descarga Scrapping</h1>
     <p>Explicacion pagina tipo Scrapping</p>
@@ -14,6 +15,22 @@
             {{ form }}
         </div>
         <input type='submit' value='Crear' class="btn btn-primary" />
+
+        {% if task_id %}
+            <div class='progress-wrapper'>
+                <div id='progress-bar' class='progress-bar' style="background-color: #68a9ef; width: 0%;">&nbsp;</div>
+            </div>
+            <div id="progress-bar-message">Waiting for progress to start...</div>
+        {% endif %}
+        <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
+
+        <script>
+        // vanilla JS version
+        document.addEventListener("DOMContentLoaded", function () {
+          var progressUrl = "{% url 'celery_progress:task_status' task_id %}";
+          CeleryProgressBar.initProgressBar(progressUrl);
+        });
+        </script>
     </form>
     <hr class="my-4">    
 </div>
