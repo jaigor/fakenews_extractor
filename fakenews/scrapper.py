@@ -103,7 +103,7 @@ class Scrapper(CsvDownloader):
             error_msg = (
                 'Error de Conexión. \n'
                 'Respuesta no encontrada para la url {} '
-            ).format(link)
+            ).format(self._basepath)
             raise NoOKResponseError(_(error_msg))
 
     def _add_links(self, html_doc, links):
@@ -142,8 +142,8 @@ class Scrapper(CsvDownloader):
 
     def _get_body(self, soup):
         divs = soup.find_all('div')
-        i = 0
         max = 1
+        body = ""
         for i in range(len(divs)):
             if len(divs[i]) > max:
                 body = divs[i]
@@ -158,7 +158,7 @@ class Scrapper(CsvDownloader):
             html = soup.find(class_=self._dateId).get_text()
         else:
             print('Internal Error: dateType not found')
-            return "No Date"
+            html = "No Date"
 
         return html
 

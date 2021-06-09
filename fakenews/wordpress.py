@@ -105,5 +105,5 @@ class WordpressAPI(CsvDownloader):
             content = post['content']['rendered']
             return [date, link, title, content]
 
-        except KeyError as err:
+        except KeyError:
             return ["No post content", "No post content", "No post content", "No post content"]

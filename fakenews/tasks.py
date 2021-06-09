@@ -186,4 +186,3 @@ def _register_new_soup(url, link_class, date_type, date_id):
         date_id=date_id,
     )
     return soup.execute()
-

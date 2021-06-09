@@ -8,9 +8,9 @@
     <p>A continuación, se muestran todos los posts pertenecientes al wordpress seleccionado.</p>
     <p>Acciones disponibles: </p>
     <ul>        
-        <li><a href={{ soup.get_update_url }}>Actualizar <img src="{% static 'arrow-counterclockwise.svg' %}" alt="update" width="16" height="16"> </a></li>
+        <li><a href={{ fakenews.get_update_url }}>Actualizar <img src="{% static 'arrow-counterclockwise.svg' %}" alt="update" width="16" height="16"> </a></li>
         {% if posts %}
-            <li> <a href={{ soup.get_download_posts_url }}>Descargar <img src="{% static 'cloud-arrow-down.svg' %}" alt="download" width="16" height="16"> </a></li>
+            <li> <a href={{ fakenews.get_download_posts_url }}>Descargar <img src="{% static 'cloud-arrow-down.svg' %}" alt="download" width="16" height="16"> </a></li>
         {% endif %}
     </ul>
     <hr class="my-4">
@@ -27,7 +27,7 @@
     <hr class="my-4">    
 
     {% if is_paginated %}
-        <nav aria-label="Scrapper Results">
+        <nav aria-label="Results">
             <ul class="pagination">
                 {% if page_obj.has_previous %}
                     <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>

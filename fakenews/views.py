@@ -1,12 +1,4 @@
-from django.urls import reverse
-
-from django.http import HttpResponseRedirect
 from django.views.generic.base import TemplateView
-
-from django.shortcuts import (
-    render,
-    get_object_or_404
-)
 
 from .base_views import (
     FakeNewsCreateView,
@@ -40,8 +32,12 @@ class IndexView(TemplateView):
 
 # WORDPRESS #
 class WordpressCreateView(FakeNewsCreateView):
-    template_name = 'wordpress/wordpress-create.html'
-    form_class = WordpressCreateForm
+
+    def __init__(self):
+        super().__init__()
+        self.template_name = 'wordpress/wordpress-create.html'
+        self.form_class = WordpressCreateForm
+        self.model = Wordpress
 
     def _run_handler(self, form):
         handler = WordpressResponseHandler(
@@ -56,9 +52,12 @@ class WordpressCreateView(FakeNewsCreateView):
 
 
 class WordpressUpdateView(FakeNewsUpdateView):
-    template_name = 'wordpress/wordpress-update.html'
-    form_class = WordpressUpdateForm
-    model = Wordpress
+
+    def __init__(self):
+        super().__init__()
+        self.form_class = WordpressUpdateForm
+        self.model = Wordpress
+        self.template_name = 'wordpress/wordpress-update.html'
 
     def _run_handler(self, form):
         handler = WordpressResponseHandler(
@@ -75,22 +74,13 @@ class WordpressUpdateView(FakeNewsUpdateView):
 
 class WordpressDetailView(FakeNewsDetailView):
     template_name = 'wordpress/wordpress-detail.html'
-
-    def get_object(self):
-        id_ = self.kwargs.get("id")
-        return get_object_or_404(Wordpress, id=id_)
+    model = Wordpress
 
 
 class WordpressDeleteView(FakeNewsDeleteView):
     template_name = 'wordpress/wordpress-delete.html'
     model = Wordpress
-
-    def get_success_url(self):
-        return reverse('fakenews:wordpress-create')
-
-    def get_object(self):
-        id_ = self.kwargs.get("id")
-        return get_object_or_404(Wordpress, id=id_)
+    pattern = 'fakenews:wordpress-create'
 
 
 class WordpressListView(FakeNewsListView):
@@ -105,46 +95,23 @@ class WordpressPostDownloadView(PostCreateView):
     template_name = 'wordpress/post-list.html'
     error_template_name = 'wordpress/wordpress-error.html'
     model = Wordpress
-
-    def _run_handler(self, request, obj):
-        try:
-            # get the input and delegate to process
-            handler = WordpressResponseHandler(
-                obj.url
-            )
-            return handler.handle_download_response()
-        except ResponseHandlerError as err:
-            context = {
-                'message': str(err)
-            }
-            return render(request, self.error_template_name, context)
+    response_handler = WordpressResponseHandler
 
 
 class WordpressPostListView(PostListView):
     template_name = 'wordpress/post-list.html'
-
-    def get_queryset(self):
-        handler = WordpressResponseHandler()
-        queryset = handler.get_queryset(self.kwargs.get("id"))
-
-        ordering = self.get_ordering()
-        if ordering:
-            if isinstance(ordering, str):
-                ordering = (ordering,)
-            queryset = queryset.order_by(*ordering)
-
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['wordpress'] = Wordpress.objects.find_by_id(self.kwargs.get("id")).get()
-        return context
+    response_handler = WordpressResponseHandler
+    parent_model = Wordpress
 
 
 # SOUP #
 class SoupCreateView(FakeNewsCreateView):
-    template_name = 'soups/soup-create.html'
-    form_class = SoupCreateForm
+
+    def __init__(self):
+        super().__init__()
+        self.template_name = 'soups/soup-create.html'
+        self.form_class = SoupCreateForm
+        self.model = Soup
 
     def _run_handler(self, form):
         handler = SoupResponseHandler(
@@ -162,9 +129,12 @@ class SoupCreateView(FakeNewsCreateView):
 
 
 class SoupUpdateView(FakeNewsUpdateView):
-    template_name = 'soups/soup-update.html'
-    form_class = SoupCreateForm
-    model = Soup
+
+    def __init__(self):
+        super().__init__()
+        self.form_class = SoupCreateForm
+        self.model = Soup
+        self.template_name = 'soups/soup-update.html'
 
     def _run_handler(self, form):
         handler = SoupResponseHandler(
@@ -183,22 +153,13 @@ class SoupUpdateView(FakeNewsUpdateView):
 
 class SoupDetailView(FakeNewsDetailView):
     template_name = 'soups/soup-detail.html'
-
-    def get_object(self):
-        id_ = self.kwargs.get("id")
-        return get_object_or_404(Soup, id=id_)
+    model = Soup
 
 
 class SoupDeleteView(FakeNewsDeleteView):
     template_name = 'soups/soup-delete.html'
     model = Soup
-
-    def get_success_url(self):
-        return reverse('fakenews:soup-create')
-
-    def get_object(self):
-        id_ = self.kwargs.get("id")
-        return get_object_or_404(Soup, id=id_)
+    pattern = 'fakenews:soup-create'
 
 
 class SoupListView(FakeNewsListView):
@@ -213,37 +174,10 @@ class SoupPostDownloadView(PostCreateView):
     template_name = 'soups/post-list.html'
     error_template_name = 'soups/soup-error.html'
     model = Soup
-
-    def _run_handler(self, request, obj):
-        try:
-            # get the input and delegate to process
-            handler = SoupResponseHandler(
-                obj.url
-            )
-            return handler.handle_download_response()
-        except ResponseHandlerError as err:
-            context = {
-                'message': str(err)
-            }
-            return render(request, self.error_template_name, context)
+    response_handler = SoupResponseHandler
 
 
 class SoupPostListView(PostListView):
     template_name = 'soups/post-list.html'
-
-    def get_queryset(self):
-        handler = SoupResponseHandler()
-        queryset = handler.get_queryset(self.kwargs.get("id"))
-
-        ordering = self.get_ordering()
-        if ordering:
-            if isinstance(ordering, str):
-                ordering = (ordering,)
-            queryset = queryset.order_by(*ordering)
-
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['soup'] = Soup.objects.find_by_id(self.kwargs.get("id")).get()
-        return context
+    model = Soup
+    response_handler = SoupResponseHandler

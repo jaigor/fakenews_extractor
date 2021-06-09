@@ -63,6 +63,15 @@ class FakeNewsResponseHandler:
 
         return fakenews_qs.get()
 
+    def _handle(self):
+        pass
+
+    def _update(self):
+        pass
+
+    def _download(self):
+        pass
+
 
 # Custom Exceptions
 class FakeNewsAlreadyExistError(Exception):
@@ -99,6 +108,9 @@ class FakeNewsRegister:
             raise FakeNewsAlreadyExistError(_(error_msg))
 
         return True
+
+    def _create_fakenews(self):
+        pass
 
 
 # POST #

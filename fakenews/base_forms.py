@@ -3,6 +3,7 @@ from .base_models import FakeNews
 
 
 class FakeNewsForm(forms.ModelForm):
+
     url = forms.URLField(
         label='Website',
         max_length=200,
@@ -15,7 +16,7 @@ class FakeNewsForm(forms.ModelForm):
             'url'
         ]
 
-    def clean_url(self, *args, **kwargs):
+    def clean_url(self):
         url = self.cleaned_data.get('url')
         if not url.endswith('/'):
             url += '/'

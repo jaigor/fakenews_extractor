@@ -37,19 +37,19 @@ class Wordpress(FakeNews):
         return urlparse(self.url).netloc
 
     def get_absolute_url(self):
-        return reverse("fakenews:wordpress-detail", kwargs={"id": self.id})
+        return reverse("fakenews:wordpress-detail", kwargs={"pk": self.id})
 
     def get_update_url(self):
-        return reverse("fakenews:wordpress-update", kwargs={"id": self.id})
+        return reverse("fakenews:wordpress-update", kwargs={"pk": self.id})
 
     def get_delete_url(self):
-        return reverse("fakenews:wordpress-delete", kwargs={"id": self.id})
+        return reverse("fakenews:wordpress-delete", kwargs={"pk": self.id})
 
     def get_posts_url(self):
-        return reverse("fakenews:wordpress-post-list", kwargs={"id": self.id})
+        return reverse("fakenews:wordpress-post-list", kwargs={"pk": self.id})
 
     def get_download_posts_url(self):
-        return reverse("fakenews:wordpress-post-download", kwargs={"id": self.id})
+        return reverse("fakenews:wordpress-post-download", kwargs={"pk": self.id})
 
 
 # SOUP TYPE #
@@ -80,19 +80,19 @@ class Soup(FakeNews):
         return urlparse(self.url).netloc
 
     def get_absolute_url(self):
-        return reverse("fakenews:soup-detail", kwargs={"id": self.id})
+        return reverse("fakenews:soup-detail", kwargs={"pk": self.id})
 
     def get_update_url(self):
-        return reverse("fakenews:soup-update", kwargs={"id": self.id})
+        return reverse("fakenews:soup-update", kwargs={"pk": self.id})
 
     def get_delete_url(self):
-        return reverse("fakenews:soup-delete", kwargs={"id": self.id})
+        return reverse("fakenews:soup-delete", kwargs={"pk": self.id})
 
     def get_posts_url(self):
-        return reverse("fakenews:post-list", kwargs={"id": self.id})
+        return reverse("fakenews:post-list", kwargs={"pk": self.id})
 
     def get_download_posts_url(self):
-        return reverse("fakenews:post-download", kwargs={"id": self.id})
+        return reverse("fakenews:post-download", kwargs={"pk": self.id})
 
 
 # POSTS #

@@ -4,7 +4,7 @@ from .base_forms import FakeNewsForm
 
 
 class WordpressCreateForm(FakeNewsForm):
-    class Meta:
+    class Meta(FakeNewsForm.Meta):
         model = Wordpress
         fields = [
             'url'
@@ -12,19 +12,20 @@ class WordpressCreateForm(FakeNewsForm):
 
 
 class WordpressUpdateForm(FakeNewsForm):
+
     post_type = forms.CharField(
         label='Tipo de Post',
         max_length=200,
         widget=forms.TextInput(attrs={'class': 'form-control'}))
 
-    class Meta:
+    class Meta(FakeNewsForm.Meta):
         model = Wordpress
         fields = [
             'url',
             'post_type'
         ]
 
-    def clean_post_type(self, *args, **kwargs):
+    def clean_post_type(self):
         post_type = self.cleaned_data.get('post_type')
         return post_type
 
@@ -59,11 +60,11 @@ class SoupCreateForm(FakeNewsForm):
             'date_id'
         ]
 
-    def clean_link_class(self, *args, **kwargs):
+    def clean_link_class(self):
         return self.cleaned_data.get('link_class')
 
-    def clean_date_type(self, *args, **kwargs):
+    def clean_date_type(self):
         return self.cleaned_data.get('date_type')
 
-    def clean_date_id(self, *args, **kwargs):
+    def clean_date_id(self):
         return self.cleaned_data.get('date_id')
