@@ -1,6 +1,4 @@
 from django.db import models
-from django.urls import reverse
-from urllib.parse import urlparse
 from .base_models import FakeNewsManager, FakeNews
 
 
@@ -32,24 +30,11 @@ class Wordpress(FakeNews):
     post_type = models.CharField(max_length=120, default='')
     domain = models.CharField(max_length=120, default='')
     objects = WordpressManager()
-
-    def get_url_domain(self):
-        return urlparse(self.url).netloc
-
-    def get_absolute_url(self):
-        return reverse("fakenews:wordpress-detail", kwargs={"pk": self.id})
-
-    def get_update_url(self):
-        return reverse("fakenews:wordpress-update", kwargs={"pk": self.id})
-
-    def get_delete_url(self):
-        return reverse("fakenews:wordpress-delete", kwargs={"pk": self.id})
-
-    def get_posts_url(self):
-        return reverse("fakenews:wordpress-post-list", kwargs={"pk": self.id})
-
-    def get_download_posts_url(self):
-        return reverse("fakenews:wordpress-post-download", kwargs={"pk": self.id})
+    path_detail = "fakenews:wordpress-detail"
+    path_update = "fakenews:wordpress-update"
+    path_delete = "fakenews:wordpress-delete"
+    path_post_list = "fakenews:wordpress-post-list"
+    path_post_download = "fakenews:wordpress-post-download"
 
 
 # SOUP TYPE #
@@ -65,6 +50,14 @@ class SoupManager(FakeNewsManager):
         soup.save()
         return soup
 
+    def update_soup(self, url, link_class, date_type, date_id):
+        return Soup.objects.find_by_url(url).update(
+            url=url,
+            link_class=link_class,
+            date_type=date_type,
+            date_id=date_id,
+        )
+
 
 class Soup(FakeNews):
     ATTR_CHOICES = (
@@ -75,24 +68,11 @@ class Soup(FakeNews):
     date_type = models.CharField(max_length=1, choices=ATTR_CHOICES)
     date_id = models.CharField(max_length=120)
     objects = SoupManager()
-
-    def get_url_domain(self):
-        return urlparse(self.url).netloc
-
-    def get_absolute_url(self):
-        return reverse("fakenews:soup-detail", kwargs={"pk": self.id})
-
-    def get_update_url(self):
-        return reverse("fakenews:soup-update", kwargs={"pk": self.id})
-
-    def get_delete_url(self):
-        return reverse("fakenews:soup-delete", kwargs={"pk": self.id})
-
-    def get_posts_url(self):
-        return reverse("fakenews:post-list", kwargs={"pk": self.id})
-
-    def get_download_posts_url(self):
-        return reverse("fakenews:post-download", kwargs={"pk": self.id})
+    path_detail = "fakenews:soup-detail"
+    path_update = "fakenews:soup-update"
+    path_delete = "fakenews:soup-delete"
+    path_post_list = "fakenews:soup-post-list"
+    path_post_download = "fakenews:soup-post-download"
 
 
 # POSTS #
@@ -127,6 +107,3 @@ class Post(models.Model):
     title = models.CharField(max_length=255, default='')
     content = models.TextField()
     objects = PostManager()
-
-    def get_absolute_url(self):
-        return reverse("fakenews:wordpress-detail", kwargs={"id": self.id})

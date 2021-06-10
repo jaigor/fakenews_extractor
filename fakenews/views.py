@@ -80,7 +80,7 @@ class WordpressDetailView(FakeNewsDetailView):
 class WordpressDeleteView(FakeNewsDeleteView):
     template_name = 'wordpress/wordpress-delete.html'
     model = Wordpress
-    pattern = 'fakenews:wordpress-create'
+    path_create = 'fakenews:wordpress-create'
 
 
 class WordpressListView(FakeNewsListView):
@@ -94,8 +94,8 @@ class WordpressListView(FakeNewsListView):
 class WordpressPostDownloadView(PostCreateView):
     template_name = 'wordpress/post-list.html'
     error_template_name = 'wordpress/wordpress-error.html'
-    model = Wordpress
     response_handler = WordpressResponseHandler
+    model = Wordpress
 
 
 class WordpressPostListView(PostListView):
@@ -159,7 +159,7 @@ class SoupDetailView(FakeNewsDetailView):
 class SoupDeleteView(FakeNewsDeleteView):
     template_name = 'soups/soup-delete.html'
     model = Soup
-    pattern = 'fakenews:soup-create'
+    path_create = 'fakenews:soup-create'
 
 
 class SoupListView(FakeNewsListView):

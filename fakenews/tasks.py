@@ -12,13 +12,27 @@ from .models import Wordpress, Soup
 
 from .register import (
     WordpressRegister,
-    WordpressDoesNotExistError,
-    WordpressAlreadyExistError,
-    SoupRegister,
-    SoupDoesNotExistError,
-    SoupAlreadyExistError
+    SoupRegister
 )
 from .base_services import FakeNewsAlreadyExistError
+
+
+# Custom Exceptions
+
+class SoupDoesNotExistError(Exception):
+    pass
+
+
+class SoupAlreadyExistError(Exception):
+    pass
+
+
+class WordpressDoesNotExistError(Exception):
+    pass
+
+
+class WordpressAlreadyExistError(Exception):
+    pass
 
 
 @shared_task(bind=True, throws=(FakeNewsAlreadyExistError, WordpressAlreadyExistError),
@@ -108,7 +122,9 @@ def _register_new_wordpress(url, post_type):
 # Soup #
 
 @shared_task(bind=True,
-             throws=(FakeNewsAlreadyExistError, SoupAlreadyExistError, FakeNewsDoesNotExistError, SoupDoesNotExistError),
+             throws=(
+                     FakeNewsAlreadyExistError, SoupAlreadyExistError, FakeNewsDoesNotExistError,
+                     SoupDoesNotExistError),
              trail=True, name="register_new_soup_posts")
 def register_soup_posts(self, url, link_class, date_type, date_id, is_update):
     try:

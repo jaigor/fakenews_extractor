@@ -10,7 +10,7 @@ from django.views.generic import (
     DeleteView
 )
 
-from .base_services import ResponseHandlerError
+from .base_services import ResponseHandlerError, FakeNewsResponseHandler
 from .forms import (
     FakeNewsForm
 )
@@ -103,10 +103,10 @@ class FakeNewsDetailView(DetailView):
 
 class FakeNewsDeleteView(DeleteView):
     model = FakeNews
-    pattern = 'fakenews:fakenews-create'
+    path_create = 'fakenews:fakenews-create'
 
     def get_success_url(self):
-        return reverse(self.pattern)
+        return reverse(self.path_create)
 
 
 class FakeNewsListView(ListView):
@@ -117,13 +117,9 @@ class FakeNewsListView(ListView):
 
 
 # POST #
-
 class PostCreateView(DetailView):
-
-    def __init__(self, **kwargs):
-        super().__init__(kwargs)
-        self.response_handler = None
-        self.error_template_name = None
+    response_handler = FakeNewsResponseHandler
+    error_template_name = None
 
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -149,7 +145,7 @@ class PostListView(ListView):
     model = Post
     context_object_name = 'posts'
     ordering = ['-id']
-    response_handler = None
+    response_handler = FakeNewsResponseHandler
     parent_model = FakeNews
 
     def get_queryset(self):

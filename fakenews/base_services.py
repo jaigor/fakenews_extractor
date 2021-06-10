@@ -1,10 +1,12 @@
 from django.utils.translation import gettext as _
+
+from .csvDownloader import CsvDownloader
 from .wordpress import (
     NoOKResponseError,
     TooManyRequestError
 )
-
 from .models import FakeNews, Post
+from .base_register import PostRegister, PostAlreadyExistError
 
 
 # Custom Exceptions
@@ -19,6 +21,9 @@ class FakeNewsResponseHandler:
             url=None
     ):
         self._url = url
+        self._model = FakeNews
+        self._exception_not_exist = FakeNewsDoesNotExistError
+        self._filename = "data.csv"
 
     def handle_response(self):
         try:
@@ -50,8 +55,14 @@ class FakeNewsResponseHandler:
         ) as err:
             raise ResponseHandlerError(_(str(err)))
 
+    def get_queryset(self, _id):
+        try:
+            return self._model.objects.get_post_queryset(_id)
+        except self._exception_not_exist as err:
+            raise FakeNewsDoesNotExistError(_(str(err)))
+
     def _get_fakenews(self):
-        fakenews_qs = FakeNews.objects.find_by_url(self._url)
+        fakenews_qs = self._model.objects.find_by_url(self._url)
         if not fakenews_qs.exists():
             # Raise a meaningful error to be catched by the client
             error_msg = (
@@ -59,9 +70,14 @@ class FakeNewsResponseHandler:
                 'Por favor, pruebe otra consulta'
             ).format(self._url)
 
-            raise FakeNewsDoesNotExistError(_(error_msg))
+            raise self._exception_not_exist(_(error_msg))
 
         return fakenews_qs.get()
+
+    def _get_internal_posts(self):
+        # valid data
+        fakenews = self._get_fakenews()
+        return self._model.objects.get_posts(fakenews.id)
 
     def _handle(self):
         pass
@@ -70,6 +86,13 @@ class FakeNewsResponseHandler:
         pass
 
     def _download(self):
+        try:
+            posts = self._get_internal_posts()
+            return CsvDownloader().get_csv_response(self._get_filename(), posts)
+        except self._exception_not_exist as err:
+            raise FakeNewsDoesNotExistError(_(str(err)))
+
+    def _get_filename(self):
         pass
 
 
@@ -82,43 +105,7 @@ class FakeNewsDoesNotExistError(Exception):
     pass
 
 
-class FakeNewsRegister:
-
-    def __init__(
-            self,
-            url
-    ):
-        self._url = url
-
-    def execute(self):
-        self.valid_data()
-        fakenews = self._create_fakenews()
-
-        return fakenews
-
-    def valid_data(self):
-        fakenews_qs = FakeNews.objects.find_by_url(self._url)
-        if fakenews_qs.exists():
-            # Raise a meaningful error to be catched by the client
-            error_msg = (
-                'Ya existe un Wordpress con esta url {} '
-                'Por favor, pruebe otra consulta'
-            ).format(self._url)
-
-            raise FakeNewsAlreadyExistError(_(error_msg))
-
-        return True
-
-    def _create_fakenews(self):
-        pass
-
-
 # POST #
-# Custom Exceptions
-class PostAlreadyExistError(Exception):
-    pass
-
-
 # PostResponse
 class PostsResponseHandler:
     def __init__(
@@ -174,61 +161,3 @@ class PostsResponseHandler:
         # create
         else:
             return register.execute()
-
-
-class PostRegister:
-
-    def __init__(
-            self,
-            date,
-            link,
-            title,
-            content
-    ):
-        self._date = date
-        self._link = link
-        self._title = title
-        self._content = content
-
-    def execute(self):
-        self.valid_data()
-        post = self._create_post()
-
-        return post
-
-    def valid_data(self):
-        post_qs = Post.objects.find_by_link(self._link)
-        if post_qs.exists():
-            # Raise a meaningful error to be catched by the client
-            error_msg = (
-                'Ya existe un post igual con el link {} '
-                'Por favor, pruebe otra consulta'
-            ).format(self._link)
-
-            raise PostAlreadyExistError(_(error_msg))
-
-        return True
-
-    def _create_post(self):
-        return Post.objects.create_post(
-            date=self._date,
-            link=self._link,
-            title=self._title,
-            content=self._content,
-        )
-
-    def update_post(self):
-        self.valid_post()
-        self._update_post()
-
-    def valid_post(self):
-        post_qs = Post.objects.find_by_link(self._link)
-        return post_qs.exists()
-
-    def _update_post(self):
-        Post.objects.find_by_link(self._link).update(
-            date=self._date,
-            link=self._link,
-            title=self._title,
-            content=self._content,
-        )

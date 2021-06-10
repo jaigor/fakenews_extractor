@@ -3,7 +3,7 @@ import pytest
 import os
 from django.http import HttpResponse
 
-from wordpress.wordpress import (
+from fakenews.wordpress import (
     WordpressAPI,
     NoOKResponseError,
     TooManyRequestError

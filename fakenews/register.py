@@ -1,14 +1,6 @@
-from .base_services import FakeNewsRegister
+from .base_register import FakeNewsRegister
 from urllib.parse import urlparse
 from .models import Wordpress, Soup
-
-
-class WordpressDoesNotExistError(Exception):
-    pass
-
-
-class WordpressAlreadyExistError(Exception):
-    pass
 
 
 class WordpressRegister(FakeNewsRegister):
@@ -32,14 +24,6 @@ class WordpressRegister(FakeNewsRegister):
             post_type=self._post_type,
             domain=self._domain,
         )
-
-
-class SoupDoesNotExistError(Exception):
-    pass
-
-
-class SoupAlreadyExistError(Exception):
-    pass
 
 
 class SoupRegister(FakeNewsRegister):
