@@ -85,7 +85,8 @@ class SoupResponseHandler(FakeNewsResponseHandler):
     def _handle(self):
         result = None
         try:
-            result = register_soup_posts.s(self._url, self._link_class, self._date_type, False).apply_async()
+            result = register_soup_posts.s(self._url, self._link_class, self._date_type, self._date_id,
+                                           False).apply_async()
             return result
         except SoupAlreadyExistError as err:
             result.revoke()
@@ -97,7 +98,8 @@ class SoupResponseHandler(FakeNewsResponseHandler):
     def _update(self):
         result = None
         try:
-            result = register_soup_posts.s(self._url, self._link_class, self._date_type, True).apply_async()
+            result = register_soup_posts.s(self._url, self._link_class, self._date_type, self._date_id,
+                                           True).apply_async()
             return result
         except self._exception_not_exist as err:
             result.revoke()

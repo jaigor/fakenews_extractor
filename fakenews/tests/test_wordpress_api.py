@@ -15,14 +15,14 @@ class TestWordpressAPI(TestCase):
     def test_get_posts_types_missing_protocol_url_raises_NoOKResponseError(self):
         with pytest.raises(NoOKResponseError):
             wordpress = WordpressAPI(
-                "www.wrong_url.com"
+                "www.wrongurl.com"
             )
             wordpress.get_posts_types()
 
     def test_get_posts_types_incorrect_url_raises_NoOKResponseError(self):
         with pytest.raises(NoOKResponseError):
             wordpress = WordpressAPI(
-                "http://www.wrong_url.com"
+                "http://www.wrongurl.com"
             )
             wordpress.get_posts_types()
 

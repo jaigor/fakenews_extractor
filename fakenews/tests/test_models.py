@@ -28,6 +28,16 @@ class TestModelsManager(TestCase):
         )
     ]
     qs_wordpress_mock = MockSet(wordpress_object[0])
+    soup_object = [
+        Soup(
+            id=100,
+            url="www.wordpress.com/data",
+            link_class="article",
+            date_type="1",
+            date_id="date"
+        )
+    ]
+    qs_soup_mock = MockSet(soup_object[0])
 
     @patch.object(Wordpress.objects, 'get_queryset', return_value=qs_wordpress_mock)
     def test_wordpress_is_created_and_returned_by_id(self, mocked):
@@ -54,6 +64,17 @@ class TestModelsManager(TestCase):
         wordpress = Wordpress.objects.find_by_url(wordpress.url).get()
 
         self.assertEqual(wordpress.post_type, "test")
+
+    def test_soup_is_created(self):
+        result = self._generate_soup()
+        assert result == self.soup_object[0]
+
+    def test_soup_update_result(self):
+        soup = self._generate_soup()
+        Soup.objects.update_soup(url=soup.url, link_class="test", date_type=soup.date_type, date_id=soup.date_id)
+        soup = Soup.objects.find_by_url(soup.url).get()
+
+        self.assertEqual(soup.link_class, "test")
 
     def test_add_post_and_count_them(self):
         wordpress = self._generate_wordpress()
@@ -108,6 +129,15 @@ class TestModelsManager(TestCase):
             url="www.wordpress.com/data",
             post_type="Pages",
             domain="www.wordpress.com"
+        )
+
+    @patch.object(Soup.objects, 'create', return_value=soup_object[0])
+    def _generate_soup(self, mocked):
+        return Soup.objects.create_soup(
+            url="www.wordpress.com/data",
+            link_class="article",
+            date_type="1",
+            date_id="date"
         )
 
     @patch.object(Post.objects, 'create', return_value=post_object[0])

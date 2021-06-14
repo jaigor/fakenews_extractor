@@ -80,6 +80,12 @@ class Scrapper(CsvDownloader):
                 'Respuesta no encontrada para la url {} '
             ).format(self._basepath)
             raise NoOKResponseError(_(error_msg))
+        except requests.exceptions.MissingSchema:
+            error_msg = (
+                'Error de clase de enlace. \n'
+                'Respuesta no encontrada para la clase {} '
+            ).format(self._linkClass)
+            raise NoOKResponseError(_(error_msg))
 
         # no links found
         if len(links) == 0:
@@ -122,6 +128,7 @@ class Scrapper(CsvDownloader):
             # didn't find link
             if div.a is not None:
                 links.append(domain + div.a['href'])
+
         return links
 
     def _get_title(self, soup):
@@ -148,7 +155,9 @@ class Scrapper(CsvDownloader):
             if len(divs[i]) > max:
                 body = divs[i]
                 max = len(divs[i])
-        return body.get_text()
+        if max > 1:
+            return body.get_text()
+        return body
 
     def _get_date(self, soup):
         html = ""
@@ -172,7 +181,6 @@ class Scrapper(CsvDownloader):
             title = self._get_title(soup)
             content = self._get_body(soup)
             date = self._get_date(soup)
-
             return [date, link, title, content]
         else:
             error_msg = (

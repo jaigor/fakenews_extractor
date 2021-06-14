@@ -4,10 +4,8 @@ from mock import patch
 import pytest
 
 from fakenews.models import Wordpress, Post
-from fakenews.register import WordpressRegister, SoupRegister
-from fakenews.base_register import PostRegister, PostAlreadyExistError
-
-from fakenews.tasks import WordpressAlreadyExistError
+from fakenews.register import WordpressRegister
+from fakenews.base_register import PostRegister, PostAlreadyExistError, FakeNewsAlreadyExistError
 
 
 def create_wordpress(url, post_type, domain):
@@ -30,8 +28,8 @@ class TestWordpressValidData(TestCase):
     )
 
     @patch.object(Wordpress.objects, 'find_by_url', return_value=qs_mock)
-    def test_when_wordpress_already_exists_raise_wordpress_already_exist_error(self, mocked):
-        with pytest.raises(WordpressAlreadyExistError):
+    def test_when_wordpress_already_exists_raise_fakenews_already_exist_error(self, mocked):
+        with pytest.raises(FakeNewsAlreadyExistError):
             use_case = WordpressRegister(
                 url="www.wordpress.com/data",
                 post_type="Pages"

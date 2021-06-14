@@ -2,7 +2,7 @@ from django.utils.translation import gettext as _
 from celery import shared_task
 from celery_progress.backend import ProgressRecorder
 
-from .scrapper import Scrapper
+from .scrapper import Scrapper, NoSoupTypeError, NoLinksFoundError
 from .wordpress import WordpressAPI
 from .base_services import (
     PostsResponseHandler,
@@ -46,7 +46,9 @@ def get_wordpress_urls(self, post_type_url, is_update):
 
         else:
             # get types of posts
-            types = _get_types(post_type_url)
+            api = WordpressAPI(post_type_url)
+            types = api.get_posts_types()
+
             count = 0
             progress_recorder = ProgressRecorder(self)
             progress_recorder.set_progress(count, len(types.items()))
@@ -74,7 +76,6 @@ def register_wordpress_list_posts(self, post_type_url_list):
 
         count = 0
         for url in post_type_url_list:
-            print(url)
             api = WordpressAPI(url)
             posts = api.get_posts_content(url)
             progress_recorder.set_progress(count + 0.5, len(post_type_url_list))
@@ -90,11 +91,6 @@ def register_wordpress_list_posts(self, post_type_url_list):
         raise FakeNewsDoesNotExistError(_(str(err)))
     except WordpressDoesNotExistError as err:
         raise WordpressDoesNotExistError(_(str(err)))
-
-
-def _get_types(url):
-    wordpress = WordpressAPI(url)
-    return wordpress.get_posts_types()
 
 
 def _get_wordpress(url):
@@ -124,7 +120,7 @@ def _register_new_wordpress(url, post_type):
 @shared_task(bind=True,
              throws=(
                      FakeNewsAlreadyExistError, SoupAlreadyExistError, FakeNewsDoesNotExistError,
-                     SoupDoesNotExistError),
+                     SoupDoesNotExistError, NoSoupTypeError, NoLinksFoundError),
              trail=True, name="register_new_soup_posts")
 def register_soup_posts(self, url, link_class, date_type, date_id, is_update):
     try:
@@ -132,7 +128,8 @@ def register_soup_posts(self, url, link_class, date_type, date_id, is_update):
         progress_recorder.set_progress(0, 100)
 
         # get all links
-        links = _get_external_links(url, link_class, date_type, date_id)
+        api = Scrapper(url, link_class, date_type, date_id)
+        links = api.get_collection()
         progress_recorder.set_progress(40, 100)
         # if no failure, register soup
         if is_update:
@@ -144,7 +141,7 @@ def register_soup_posts(self, url, link_class, date_type, date_id, is_update):
         progress_recorder.set_progress(50, 100)
 
         # register links
-        posts = _get_external_posts(url, link_class, date_type, date_id, links)
+        posts = api.get_posts_content(links)
         progress_recorder.set_progress(80, 100)
 
         # register posts
@@ -161,23 +158,10 @@ def register_soup_posts(self, url, link_class, date_type, date_id, is_update):
         raise FakeNewsDoesNotExistError(_(str(err)))
     except SoupDoesNotExistError as err:
         raise SoupDoesNotExistError(_(str(err)))
-
-
-def _get_external_links(url, link_class, date_type, date_id):
-    scrapper = Scrapper(url,
-                        link_class,
-                        date_type,
-                        date_id)
-    return scrapper.get_collection()
-
-
-def _get_external_posts(url, link_class, date_type, date_id, links):
-    scrapper = Scrapper(url,
-                        link_class,
-                        date_type,
-                        date_id)
-
-    return scrapper.get_posts_content(links)
+    except NoSoupTypeError as err:
+        raise NoSoupTypeError(_(str(err)))
+    except NoLinksFoundError as err:
+        raise NoLinksFoundError(_(str(err)))
 
 
 def _get_soup(url):
@@ -195,10 +179,10 @@ def _get_soup(url):
 
 
 def _register_new_soup(url, link_class, date_type, date_id):
-    soup = SoupRegister(
+    register = SoupRegister(
         url=url,
         link_class=link_class,
         date_type=date_type,
         date_id=date_id,
     )
-    return soup.execute()
+    return register.execute()

@@ -8,6 +8,15 @@ from fakenews.forms import (
 
 class TestWordpressForms(TestCase):
 
+    def test_url_with_wrong_format_is_cleaned(self):
+        data = {
+            'url': 'https://www.snopes.com'
+        }
+
+        form = WordpressCreateForm(data=data)
+        assert form.is_valid() is True
+        assert form.cleaned_data['url'] == 'https://www.snopes.com/'
+
     def test_create_when_all_fields_are_filled_up_and_the_form_is_valid(self):
         data = {
             'url': 'https://www.snopes.com/'

@@ -18,6 +18,7 @@ class FakeNewsRegister:
             url
     ):
         self._url = url
+        self._model = FakeNews
 
     def execute(self):
         self.valid_data()
@@ -26,7 +27,7 @@ class FakeNewsRegister:
         return fakenews
 
     def valid_data(self):
-        fakenews_qs = FakeNews.objects.find_by_url(self._url)
+        fakenews_qs = self._model.objects.find_by_url(self._url)
         if fakenews_qs.exists():
             # Raise a meaningful error to be catched by the client
             error_msg = (
@@ -46,6 +47,10 @@ class FakeNewsRegister:
 
 
 # Custom Exceptions
+class PostDoesNotExistError(Exception):
+    pass
+
+
 class PostAlreadyExistError(Exception):
     pass
 
@@ -65,10 +70,13 @@ class PostRegister:
         self._content = content
 
     def execute(self):
-        self.valid_data()
-        post = self._create_post()
-
-        return post
+        # exists = update
+        if Post.objects.find_by_link(self._link).exists():
+            self.update_post()
+            return Post.objects.find_by_link(self._link).get()
+        # create
+        else:
+            return self._create_post()
 
     def valid_data(self):
         post_qs = Post.objects.find_by_link(self._link)
@@ -84,6 +92,7 @@ class PostRegister:
         return True
 
     def _create_post(self):
+        self.valid_data()
         return Post.objects.create_post(
             date=self._date,
             link=self._link,
@@ -93,16 +102,22 @@ class PostRegister:
 
     def update_post(self):
         self.valid_post()
-        self._update_post()
-
-    def valid_post(self):
-        post_qs = Post.objects.find_by_link(self._link)
-        return post_qs.exists()
-
-    def _update_post(self):
         Post.objects.find_by_link(self._link).update(
             date=self._date,
             link=self._link,
             title=self._title,
             content=self._content,
         )
+
+    def valid_post(self):
+        post_qs = Post.objects.find_by_link(self._link)
+        if post_qs.exists():
+            # Raise a meaningful error to be catched by the client
+            error_msg = (
+                'No existe un post igual con el link {} '
+                'Por favor, pruebe otra consulta'
+            ).format(self._link)
+
+            raise PostDoesNotExistError(_(error_msg))
+
+        return True
