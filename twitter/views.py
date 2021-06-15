@@ -13,8 +13,9 @@ from django.views.generic import (
     DeleteView
 )
 
+from .base_views import SocialListView, SocialCreateView
 from .forms import QueryCreateForm
-from .models import Tweet, User, Query
+from .models import Tweet, Query
 from .services import (
     ResponseHandler,
     ResponseHandlerError
@@ -22,8 +23,12 @@ from .services import (
 
 
 class QueryCreateView(CreateView):
-    template_name = 'twitters/query-create.html'
-    form_class = QueryCreateForm
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self.context = {}
+        self.form_class = QueryCreateForm
+        self.template_name = 'twitters/query-create.html'
 
     def get_success_url(self):
         return '/'
@@ -33,28 +38,22 @@ class QueryCreateView(CreateView):
 
     # GET Method
     def get(self, request, *args, **kwargs):
-        form = QueryCreateForm()
-        context = {
+        form = self.form_class
+        self.context = {
             'form': form
         }
-        return render(request, self.template_name, context)
+        return render(request, self.template_name, self.context)
 
     # POST Method
     def post(self, request, *args, **kwargs):
-        form = QueryCreateForm(request.POST or None)
+        form = self.form_class(request.POST or None)
 
         if form.is_valid():
             # get the input and delegate to process
             self._run_handler(form)
-            context = {
-                'form': form
-            }
-            return render(request, self.template_name, context)
-        else:
-            context = {
-                'form': form
-            }
-            return render(request, self.template_name, context)
+
+        self.context['form'] = form
+        return render(request, self.template_name, self.context)
 
     def _run_handler(self, form):
         handler = ResponseHandler(
@@ -62,15 +61,21 @@ class QueryCreateView(CreateView):
         )
         # handle the output
         try:
-            handler.handle_response()
+            result = handler.handle_response()
+            self.context['task_ids'] = [result, result.parent]
+
         except ResponseHandlerError as err:
             form.add_error('query', str(err))
 
 
 class QueryUpdateView(UpdateView):
-    template_name = 'twitters/query-update.html'
-    form_class = QueryCreateForm
-    model = Query
+
+    def __init__(self, **kwargs):
+        super().__init__()
+        self.context = {}
+        self.form_class = QueryCreateForm
+        self.model = Query
+        self.template_name = 'twitters/query-update.html'
 
     def get_success_url(self):
         return '/'
@@ -78,37 +83,27 @@ class QueryUpdateView(UpdateView):
     def form_valid(self, form):
         return super().form_valid(form)
 
-    def get_object(self):
-        id_ = self.kwargs.get("id")
-        return get_object_or_404(Query, id=id_)
-
     # GET Method
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
-        form = QueryCreateForm(instance=obj)
-        context = {
+        form = self.form_class(instance=obj)
+        self.context = {
             'object': obj,
             'form': form
         }
-        return render(request, self.template_name, context)
+        return render(request, self.template_name, self.context)
 
     # POST Method
     def post(self, request, *args, **kwargs):
         obj = self.get_object()
 
-        form = QueryCreateForm(request.POST or None, instance=obj)
+        form = self.form_class(request.POST or None, instance=obj)
         if form.is_valid():
             # get the input and delegate to process
             self._run_handler(form)
-            context = {
-                'form': form
-            }
-            return render(request, self.template_name, context)
-        else:
-            context = {
-                'form': form
-            }
-            return render(request, self.template_name, context)
+
+        self.context['form'] = form
+        return render(request, self.template_name, self.context)
 
     def _run_handler(self, form):
         handler = ResponseHandler(
@@ -116,43 +111,25 @@ class QueryUpdateView(UpdateView):
         )
         # handle the output
         try:
-            handler.handle_update_response()
+            result = handler.handle_update_response()
+            self.context['task_ids'] = [result, result.parent]
+
         except ResponseHandlerError as err:
             form.add_error('query', str(err))
 
 
 class QueryDetailView(DetailView):
     template_name = 'twitters/query-detail.html'
-
-    def get_success_url(self):
-        return '/'
-
-    def get_object(self):
-        id_ = self.kwargs.get("id")
-        return get_object_or_404(Query, id=id_)
-
-    # GET Method
-    def get(self, request, *args, **kwargs):
-        obj = self.get_object()
-        context = {
-            'object': obj
-        }
-        return render(request, self.template_name, context)
+    model = Query
 
 
 class QueryDeleteView(DeleteView):
     template_name = 'twitters/query-delete.html'
     model = Query
+    path_create = 'twitter:query-create'
 
     def get_success_url(self):
-        return reverse('twitter:query-create')
-
-    def form_valid(self, form):
-        return super().form_valid(form)
-
-    def get_object(self):
-        id_ = self.kwargs.get("id")
-        return get_object_or_404(Query, id=id_)
+        return reverse(self.path_create)
 
 
 class QueryListView(ListView):
@@ -169,7 +146,7 @@ class TweetCreateView(DetailView):
     template_name = 'twitters/tweet-list.html'
     error_template_name = 'twitters/twitter-error.html'
 
-    def get_object(self):
+    def get_object(self, **kwargs):
         id_ = self.kwargs.get("id")
         return get_object_or_404(Query, id=id_)
 
@@ -197,98 +174,18 @@ class TweetCreateView(DetailView):
         handler.handle_update_response()
 
 
-class TweetDownloadView(DetailView):
+class TweetDownloadView(SocialCreateView):
     template_name = 'twitters/tweet-list.html'
     error_template_name = 'twitters/twitter-error.html'
-
-    def get_object(self):
-        id_ = self.kwargs.get("id")
-        return get_object_or_404(Query, id=id_)
-
-    # GET Method
-    def get(self, request, *args, **kwargs):
-        obj = self.get_object()
-        context = {
-            'object': obj
-        }
-        # handle the output
-        try:
-            # get the input and delegate to process
-            return self._run_handler(obj)
-        except ResponseHandlerError as err:
-            context = {
-                'message': str(err)
-            }
-            return render(request, self.error_template_name, context)
-
-    def _run_handler(self, obj):
-        handler = ResponseHandler(
-            obj.text
-        )
-        return handler.handle_download_response()
+    response_handler = ResponseHandler
+    model = Query
+    exception = ResponseHandlerError
 
 
-class TweetListView(ListView):
+class TweetListView(SocialListView):
     template_name = 'twitters/tweet-list.html'
-    paginate_by = 10  # if pagination is desired
     model = Tweet
     context_object_name = 'tweets'
-    ordering = ['-id']
-
-    def get_object(self):
-        id_ = self.kwargs.get("id")
-        return get_object_or_404(Query, id=id_)
-
-    def get_queryset(self):
-        obj = self.get_object()
-        handler = ResponseHandler(
-            obj.text
-        )
-        queryset = handler.get_tweet_queryset()
-
-        ordering = self.get_ordering()
-        if ordering:
-            if isinstance(ordering, str):
-                ordering = (ordering,)
-            queryset = queryset.order_by(*ordering)
-
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['query'] = Query.objects.find_by_id(self.kwargs.get("id")).get()
-        return context
-
-
-# USERS #
-class UserListView(ListView):
-    template_name = 'twitters/user-list.html'
-    paginate_by = 10  # if pagination is desired
-    model = User
-    context_object_name = 'users'
-    ordering = ['-id']
-
-    def get_object(self):
-        id_ = self.kwargs.get("id")
-        return get_object_or_404(Query, id=id_)
-
-    def get_queryset(self):
-        obj = self.get_object()
-        handler = ResponseHandler(
-            obj.text
-        )
-        # get users and add to context (ahora coge tweets)
-        queryset = handler.get_user_queryset()
-
-        ordering = self.get_ordering()
-        if ordering:
-            if isinstance(ordering, str):
-                ordering = (ordering,)
-            queryset = queryset.order_by(*ordering)
-
-        return queryset
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['query'] = Query.objects.find_by_id(self.kwargs.get("id")).get()
-        return context
+    response_handler = ResponseHandler
+    parent_model = Query
+    object_name = 'query'

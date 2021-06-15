@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from django.db import models
 from django.urls import reverse
 
@@ -38,6 +40,9 @@ class FakeNews(models.Model):
     path_delete = "fakenews:fakenews-delete"
     path_post_list = "fakenews:fakenews-post-list"
     path_post_download = "fakenews:fakenews-post-download"
+
+    def get_url_domain(self):
+        return urlparse(self.url).netloc
 
     def get_absolute_url(self):
         return reverse(self.path_detail, kwargs={"pk": self.pk})

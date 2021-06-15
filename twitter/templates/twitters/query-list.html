@@ -16,11 +16,11 @@
         {% for instance in querys %}
             <li> 
                 <a href={{ instance.get_absolute_url }}>{{ instance.text }} </a>
-                <a href={{ instance.get_update_url }}> <img src="{% static 'pencil-square.svg' %}" alt="modify" width="16" height="16"> </a> 
+                <a href={{ instance.get_update_url }}> <img src="{% static 'pencil-square.svg' %}" alt="modify" width="16" height="16"> </a>
                 <a href={{ instance.get_delete_url }}> <img src="{% static 'trash.svg' %}" alt="delete" width="16" height="16"> </a>
             </li>
         {% empty %}
-            <li>No hay tweeets registrados.</li>
+            <li>No hay tweets registrados.</li>
         {% endfor %}
     </ul>
     <hr class="my-4">

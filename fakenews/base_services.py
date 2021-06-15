@@ -1,6 +1,6 @@
 from django.utils.translation import gettext as _
 
-from .csvDownloader import CsvDownloader
+from pages.downloader import Downloader
 from .models import FakeNews
 from .base_register import (
     PostRegister,
@@ -44,10 +44,14 @@ class FakeNewsResponseHandler:
 
     def handle_download_response(self):
         try:
+            filename = self._get_filename()
             posts = self._get_internal_posts()
-            return CsvDownloader().get_csv_response(self._get_filename(), posts)
+            headers = ['date', 'link', 'title', 'content']
+
+            return Downloader().get_csv_response(filename, posts, headers)
         except (
-                FakeNewsDoesNotExistError
+                FakeNewsDoesNotExistError,
+                self._exception_not_exist
         ) as err:
             raise ResponseHandlerError(_(str(err)))
 

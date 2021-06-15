@@ -1,12 +1,9 @@
-from django.http import HttpResponse
 from django.utils.translation import gettext as _
 
-from tempfile import NamedTemporaryFile
 import requests
-import os
-import csv
 import json
 
+from pages.downloader import Downloader
 
 # Custom Exceptions
 class TweetsRequestError(Exception):
@@ -18,36 +15,16 @@ class UserRequestError(Exception):
 
 
 # Base Class
-class TwitterAPI:
+class TwitterAPI(Downloader):
 
     def __init__(self):
+        super().__init__()
         self._keys = self._auth()
         self._bearer_token = self._keys["Bearer token"]
         self._headers = self._create_headers(self._bearer_token)
 
-    def get_csv_response(self, filename, objects, headers):
-        csvfile = NamedTemporaryFile(delete=False)
-        try:
-            # create csv file
-            with open(filename, 'a', encoding="utf-8", newline='') as csvfile:
-                response = self._generate_csv_response(filename)
-                csvwriter = csv.writer(response)
-
-                # csv header
-                csvwriter.writerow(headers)
-                for obj in objects:
-                    csvwriter.writerow(obj)
-                    csvfile.flush()
-
-                return response
-        finally:
-            print("Info: Closing and deleting file")
-            csvfile.close()
-            os.unlink(csvfile.name)
-
     # To set your envionment variables in your terminal run the following line:
     # export 'BEARER_TOKEN'='<your_bearer_token>'
-
     def _auth(self):
         with open("twitter/config.json", "r") as f:
             keys = json.load(f)
@@ -69,11 +46,6 @@ class TwitterAPI:
                 )
             )
         return response.json()
-
-    def _generate_csv_response(self, filename):
-        response = HttpResponse(content_type="text/csv")
-        response['Content-Disposition'] = 'attachment; filename=' + filename
-        return response
 
 
 class TweetLookup(TwitterAPI):
@@ -105,10 +77,13 @@ class TweetLookup(TwitterAPI):
         try:
             url = self._create_tweet_url()
             json_response = self._connect_to_endpoint(url)
-            # print(json.dumps(json_response, indent=4, sort_keys=True))
+            print(json.dumps(json_response, indent=4, sort_keys=True))
             return json_response['data']
 
-        except requests.exceptions.RequestException as err:
+        except (
+                requests.exceptions.RequestException,
+                KeyError
+        ):
             error_msg = (
                 'No se ha encontrado un tweet de Twitter válido'
                 'Por favor, pruebe otra consulta'
@@ -148,7 +123,7 @@ class UserLookup(TwitterAPI):
             # print(json.dumps(json_response, indent=4, sort_keys=True))
             return json_response['data']
 
-        except requests.exceptions.RequestException as err:
+        except requests.exceptions.RequestException:
             error_msg = (
                 'No se ha encontrado un Usuario de Twitter válido'
                 'Por favor, pruebe otra consulta'

@@ -8,7 +8,7 @@
     <p>A continuación, se muestran todos los tweets pertenecientes a la consulta seleccionada.</p>
     <p>Acciones disponibles: </p>
     <ul>        
-        <li><a href={{ query.get_update_tweets_url }}>Actualizar <img src="{% static 'arrow-counterclockwise.svg' %}" alt="update" width="16" height="16"> </a></li>
+        <li><a href={{ query.get_update_url }}>Actualizar <img src="{% static 'arrow-counterclockwise.svg' %}" alt="update" width="16" height="16"> </a></li>
         {% if tweets %}
             <li> <a href={{ query.get_download_tweets_url }}>Descargar <img src="{% static 'cloud-arrow-down.svg' %}" alt="download" width="16" height="16"> </a></li>
         {% endif %}

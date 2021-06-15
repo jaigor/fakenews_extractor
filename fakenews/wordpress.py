@@ -4,7 +4,7 @@ import requests
 import time
 import json
 
-from fakenews.csvDownloader import CsvDownloader
+from pages.downloader import Downloader
 
 
 class NoOKResponseError(Exception):
@@ -15,12 +15,10 @@ class TooManyRequestError(Exception):
     pass
 
 
-class WordpressAPI(CsvDownloader):
+class WordpressAPI(Downloader):
 
-    def __init__(
-            self,
-            basepath
-    ):
+    def __init__(self, basepath):
+        super().__init__()
         with open("fakenews/config.json", "r") as f:
             _keys = json.load(f)
             # constants

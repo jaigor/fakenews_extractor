@@ -100,6 +100,13 @@ class PostManager(models.Manager):
             content=content,
         )
 
+    def get_all_posts(self):
+        posts = []
+        for post in Post.objects.all():
+            posts.append([post.date, post.link, post.title, post.content])
+
+        return posts
+
 
 class Post(models.Model):
     link = models.CharField(max_length=255, unique=True)

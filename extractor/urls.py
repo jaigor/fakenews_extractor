@@ -18,7 +18,7 @@ from django.urls import include, path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from pages.views import(
+from pages.views import (
     HomeView,
     AboutView,
     CsvView,
@@ -27,8 +27,6 @@ from pages.views import(
     )
 
 urlpatterns = [
-    #path('wordpress/', include('wordpress.urls')),
-    #path('soup/', include('soup.urls')),
     path('twitter/', include('twitter.urls')),
     path('fakenews/', include('fakenews.urls')),
 

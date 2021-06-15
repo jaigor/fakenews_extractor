@@ -3,9 +3,10 @@ from .models import Query
 
 
 class QueryCreateForm(forms.ModelForm):
+
     query = forms.CharField(
         label='Texto a buscar',
-        max_length=120,
+        max_length=512,
         widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     class Meta:
@@ -14,5 +15,5 @@ class QueryCreateForm(forms.ModelForm):
             'query'
         ]
 
-    def clean_url(self, *args, **kwargs):
+    def clean_url(self):
         return self.cleaned_data.get('query')

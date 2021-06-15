@@ -2,6 +2,7 @@
 
 {% block content %}
 {% include 'twitters/twitter-header.html' %}
+{% load static %}
 <div class="container">
     <h1>Descarga Twitter</h1>
     <p>Explicacion Twitter</p>
@@ -14,7 +15,32 @@
             {{ form }}
         </div>
         <input type='submit' value='Crear' class="btn btn-primary" />
+
+        {% for task_id in task_ids %}
+            <div class='progress-wrapper-{{ forloop.counter0 }}'>
+                <div id='progress-bar-{{ forloop.counter0 }}' class='progress-bar-{{ forloop.counter0 }}' style="background-color: #68a9ef; width: 0%;">&nbsp;</div>
+                <div id="progress-bar-message-{{ forloop.counter0 }}">Waiting for progress to start...</div>
+            </div>
+        {% endfor %}
+        <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
+
+        <script>
+        // vanilla JS version
+        document.addEventListener("DOMContentLoaded", function () {
+            const task_urls = [
+                {% for task_id in task_ids %}
+                   "{% url 'celery_progress:task_status' task_id %}",
+                {% endfor %}];
+
+            for (var i = 0; i < task_urls.length; i++) {
+                CeleryProgressBar.initProgressBar(task_urls[i], {
+                    progressBarId: "progress-bar-" + i,
+                    progressBarMessageId: "progress-bar-message-" + i
+                });
+            }
+
+        });
+        </script>
     </form>
-    <hr class="my-4">
 </div>
 {% endblock %}

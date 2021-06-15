@@ -22,10 +22,11 @@ class Downloader:
                 csvwriter.writerow(headers)
                 for obj in objects:
                     csvwriter.writerow(obj)
+                    csvfile.flush()
 
                 return response
         finally:
-            print("closing and deleting file")
+            print("Info: Closing and deleting file")
             csvfile.close()
             os.unlink(csvfile.name)
 

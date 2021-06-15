@@ -53,7 +53,7 @@ class TestWordpressAPI(TestCase):
         )
         filename = "data.csv"
         posts = correct_post.get_posts_content("https://www.snopes.com/wp-json/wp/v2/posts/")
-        response = correct_post.get_csv_response(filename, posts)
+        response = correct_post.get_csv_response(filename, posts, ['date', 'link', 'title', 'content'])
 
         assert not os.path.isfile(filename)
 
@@ -63,6 +63,6 @@ class TestWordpressAPI(TestCase):
         )
         filename = "data.csv"
         posts = correct_post.get_posts_content("https://www.snopes.com/wp-json/wp/v2/posts/")
-        response = correct_post.get_csv_response(filename, posts)
+        response = correct_post.get_csv_response(filename, posts, ['date', 'link', 'title', 'content'])
 
         assert isinstance(response, HttpResponse)

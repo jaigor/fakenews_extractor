@@ -5,12 +5,12 @@ from django.utils import dateparse
 
 class UserManager(models.Manager):
 
-    def find_by_id(self, id):
+    def find_by_id(self, _id):
         queryset = self.get_queryset()
-        return queryset.filter(id=id)
+        return queryset.filter(id=_id)
 
-    def add_tweet(self, id, tweet):
-        user = self.find_by_id(id).get()
+    def add_tweet(self, _id, tweet):
+        user = self.find_by_id(_id).get()
         user.tweets.add(tweet)
 
     def get_all_users(self):
@@ -28,8 +28,39 @@ class UserManager(models.Manager):
                 user.url,
                 user.verified
             ])
-
         return users
+
+    def create_user(self, _id, name, username, created_at, description, location, profile_image_url, protected,
+                    public_metrics, url, verified):
+        user = User.objects.create(
+            id=_id,
+            name=name,
+            username=username,
+            created_at=created_at,
+            description=description,
+            location=location,
+            profile_image_url=profile_image_url,
+            protected=protected,
+            public_metrics=public_metrics,
+            url=url,
+            verified=verified)
+        user.save()
+        return user
+
+    def update_user(self, _id, name, username, created_at, description, location, profile_image_url, protected,
+                    public_metrics, url, verified):
+        return User.objects.find_by_id(_id).update(
+            id=_id,
+            name=name,
+            username=username,
+            created_at=created_at,
+            description=description,
+            location=location,
+            profile_image_url=profile_image_url,
+            protected=protected,
+            public_metrics=public_metrics,
+            url=url,
+            verified=verified)
 
 
 class User(models.Model):
@@ -59,13 +90,33 @@ class User(models.Model):
 
 class TweetManager(models.Manager):
 
-    def find_by_id(self, id):
+    def find_by_id(self, _id):
         queryset = self.get_queryset()
-        return queryset.filter(id=id)
+        return queryset.filter(id=_id)
 
-    def add_author(self, id, user):
-        tweet = self.find_by_id(id)
+    def add_author(self, _id, user):
+        tweet = self.find_by_id(_id)
         tweet.author = user
+
+    def create_tweet(self, _id, text, author_id, conversation_id, created_at, lang):
+        tweet = Tweet.objects.create(
+            id=_id,
+            text=text,
+            author_id=author_id,
+            conversation_id=conversation_id,
+            created_at=created_at,
+            lang=lang)
+        tweet.save()
+        return tweet
+
+    def update_tweet(self, _id, text, author_id, conversation_id, created_at, lang):
+        return Tweet.objects.find_by_id(_id).update(
+            id=_id,
+            text=text,
+            author_id=author_id,
+            conversation_id=conversation_id,
+            created_at=created_at,
+            lang=lang)
 
 
 class Tweet(models.Model):
@@ -89,53 +140,72 @@ class Tweet(models.Model):
 
 class QueryManager(models.Manager):
 
-    def find_by_id(self, id):
+    def find_by_id(self, _id):
         queryset = self.get_queryset()
-        return queryset.filter(id=id)
+        return queryset.filter(id=_id)
 
     def find_by_text(self, text):
         queryset = self.get_queryset()
         return queryset.filter(text=text)
 
-    def get_tweet_queryset(self, id):
-        query = self.find_by_id(id).get()
+    def get_tweet_queryset(self, _id):
+        query = self.find_by_id(_id).get()
         return query.tweets.all()
 
     def add_tweet(self, text, tweet):
         query = self.find_by_text(text).get()
         query.tweets.add(tweet)
 
-    def get_tweets(self, id):
-        query = self.find_by_id(id).get()
+    def get_tweets(self, _id):
+        query = self.find_by_id(_id).get()
         tweets = []
         for tweet in query.tweets.all():
             tweets.append([tweet.text, tweet.author, tweet.conversation_id, tweet.created_at, tweet.lang])
-
         return tweets
+
+    def create_query(self, text):
+        query = Query.objects.create(
+            text=text,
+        )
+        query.save()
+        return query
+
+    def update_query(self, text):
+        return Query.objects.find_by_text(text).update(
+            text=text
+        )
 
 
 class Query(models.Model):
     text = models.CharField(max_length=256, unique=True)  # max_lenght = required
     tweets = models.ManyToManyField(Tweet, blank=True)  # can be null = Empty
     objects = QueryManager()
+    path_detail = "twitter:query-detail"
+    path_update = "twitter:query-update"
+    path_delete = "twitter:query-delete"
+    path_tweet_list = "twitter:tweet-list"
+    path_tweet_download = "twitter:tweet-download"
 
     def get_absolute_url(self):
-        return reverse("twitter:query-detail", kwargs={"id": self.id})
+        return reverse(self.path_detail, kwargs={"pk": self.pk})
 
-    def get_formatted_date(self):
-        return dateparse.parse_datetime(self.created_at)
+    def get_update_url(self):
+        return reverse(self.path_update, kwargs={"pk": self.pk})
+
+    def get_delete_url(self):
+        return reverse(self.path_delete, kwargs={"pk": self.pk})
 
     def get_tweets_url(self):
-        return reverse("twitter:tweet-list", kwargs={"id": self.id})
-
-    def get_update_tweets_url(self):
-        return reverse("twitter:tweet-update", kwargs={"id": self.id})
+        return reverse(self.path_tweet_list, kwargs={"pk": self.pk})
 
     def get_download_tweets_url(self):
-        return reverse("twitter:tweet-download", kwargs={"id": self.id})
+        return reverse(self.path_tweet_download, kwargs={"pk": self.pk})
+
+    def get_update_tweets_url(self):
+        return reverse("twitter:tweet-update", kwargs={"pk": self.pk})
 
     def get_users_url(self):
-        return reverse("twitter:user-list", kwargs={"id": self.id})
+        return reverse("twitter:user-list", kwargs={"pk": self.pk})
 
     def __str__(self):
         return self.text

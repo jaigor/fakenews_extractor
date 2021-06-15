@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import time
 import json
 
-from fakenews.csvDownloader import CsvDownloader
+from pages.downloader import Downloader
 
 
 class NoSoupTypeError(Exception):
@@ -24,15 +24,10 @@ class TooManyRequestError(Exception):
     pass
 
 
-class Scrapper(CsvDownloader):
+class Scrapper(Downloader):
 
-    def __init__(
-            self,
-            basepath,
-            linkClass=None,
-            dateType=None,
-            dateId=None
-    ):
+    def __init__(self, basepath, linkClass=None, dateType=None, dateId=None):
+        super().__init__()
         with open("fakenews/config.json", "r") as f:
             _keys = json.load(f)
             # constants
