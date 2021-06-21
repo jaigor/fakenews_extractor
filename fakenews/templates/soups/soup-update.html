@@ -2,6 +2,7 @@
 
 {% block content %}
 {% include 'soups/soup-header.html' %}
+{% load static %}
 <div class="container">
     <h1>Modificar página Scrapping</h1>
 
@@ -20,6 +21,7 @@
         {% endif %}
         <script src="{% static 'celery_progress/celery_progress.js' %}"></script>
 
+        {% if task_id %}
         <script>
         // vanilla JS version
         document.addEventListener("DOMContentLoaded", function () {
@@ -27,6 +29,7 @@
           CeleryProgressBar.initProgressBar(progressUrl);
         });
         </script>
+        {% endif %}
     </form>
 </div>
 {% endblock %}

@@ -173,11 +173,11 @@ class SoupListView(FakeNewsListView):
 class SoupPostDownloadView(PostCreateView):
     template_name = 'soups/post-list.html'
     error_template_name = 'soups/soup-error.html'
-    model = Soup
     response_handler = SoupResponseHandler
+    model = Soup
 
 
 class SoupPostListView(PostListView):
     template_name = 'soups/post-list.html'
-    model = Soup
     response_handler = SoupResponseHandler
+    parent_model = Soup

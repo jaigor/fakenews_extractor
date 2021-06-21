@@ -111,7 +111,7 @@ class PostRegister:
 
     def valid_post(self):
         post_qs = Post.objects.find_by_link(self._link)
-        if post_qs.exists():
+        if not post_qs.exists():
             # Raise a meaningful error to be catched by the client
             error_msg = (
                 'No existe un post igual con el link {} '

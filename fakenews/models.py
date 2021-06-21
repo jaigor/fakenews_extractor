@@ -103,7 +103,11 @@ class PostManager(models.Manager):
     def get_all_posts(self):
         posts = []
         for post in Post.objects.all():
-            posts.append([post.date, post.link, post.title, post.content])
+            posts.append([
+                post.date,
+                post.link,
+                post.title,
+                post.content])
 
         return posts
 

@@ -19,7 +19,7 @@ urlpatterns = [
     path('<int:pk>/', QueryDetailView.as_view(), name='query-detail'),
     path('<int:pk>/update/', QueryUpdateView.as_view(), name='query-update'),
     path('<int:pk>/delete/', QueryDeleteView.as_view(), name='query-delete'),
-    
+
     path('<int:pk>/createtweets/', TweetCreateView.as_view(), name='tweet-create'),
     path('<int:pk>/downloadtweets/', TweetDownloadView.as_view(), name='tweet-download'),
     path('<int:pk>/listtweet/', TweetListView.as_view(), name='tweet-list'),

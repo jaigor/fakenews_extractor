@@ -77,7 +77,7 @@ class TweetLookup(TwitterAPI):
         try:
             url = self._create_tweet_url()
             json_response = self._connect_to_endpoint(url)
-            print(json.dumps(json_response, indent=4, sort_keys=True))
+            #print(json.dumps(json_response, indent=4, sort_keys=True))
             return json_response['data']
 
         except (

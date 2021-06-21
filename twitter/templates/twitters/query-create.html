@@ -35,7 +35,8 @@
             for (var i = 0; i < task_urls.length; i++) {
                 CeleryProgressBar.initProgressBar(task_urls[i], {
                     progressBarId: "progress-bar-" + i,
-                    progressBarMessageId: "progress-bar-message-" + i
+                    progressBarMessageId: "progress-bar-message-" + i,
+                    onSuccess: 'ok'
                 });
             }
 

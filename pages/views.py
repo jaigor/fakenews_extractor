@@ -1,11 +1,10 @@
 from django.views.generic import TemplateView
-from django.shortcuts import (
-    render
-)
 
+from .base_views import DownloadView
 from .services import (
-    DownloadResponseHandler,
-    ResponseHandlerError
+    PostDownloadResponseHandler,
+    UserDownloadResponseHandler,
+    TweetDownloadResponseHandler
 )
 
 
@@ -22,45 +21,28 @@ class CsvView(TemplateView):
     template_name = 'download.html'
 
 
-class DownloadPostsView(TemplateView):
+class DownloadPostsView(DownloadView):
     template_name = 'download.html'
     error_template_name = 'error.html'
 
-    # GET Method
-    def get(self, request, *args, **kwargs):
-        # handle the output
-        try:
-            # get the input and delegate to process
-            return self._run_handler()
-        except ResponseHandlerError as err:
-            context = {
-                'message': str(err)
-            }
-            return render(request, self.error_template_name, context)
-
     def _run_handler(self):
-        handler = DownloadResponseHandler(
-        )
-        return handler.handle_all_posts_response()
+        handler = PostDownloadResponseHandler()
+        return handler.handle_all_response()
 
 
-class DownloadUsersView(TemplateView):
+class DownloadUsersView(DownloadView):
     template_name = 'download.html'
     error_template_name = 'error.html'
 
-    # GET Method
-    def get(self, request, *args, **kwargs):
-        # handle the output
-        try:
-            # get the input and delegate to process
-            return self._run_handler()
-        except ResponseHandlerError as err:
-            context = {
-                'message': str(err)
-            }
-            return render(request, self.error_template_name, context)
+    def _run_handler(self):
+        handler = UserDownloadResponseHandler()
+        return handler.handle_all_response()
+
+
+class DownloadTweetsView(DownloadView):
+    template_name = 'download.html'
+    error_template_name = 'error.html'
 
     def _run_handler(self):
-        handler = DownloadResponseHandler(
-        )
-        return handler.handle_all_users_response()
+        handler = TweetDownloadResponseHandler()
+        return handler.handle_all_response()

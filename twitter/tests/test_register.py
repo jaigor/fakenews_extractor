@@ -13,6 +13,50 @@ from twitter.register import (
     UserRegister
 )
 
+qs_user_mock = MockSet(
+    User(
+        id=100,
+        name='name',
+        username='username',
+        created_at='01/01/2021',
+        profile_image_url='profile_image_url',
+        protected=True,
+        public_metrics='public_metrics',
+        verified=True,
+        description='description',
+        location='location',
+        url='url'
+    )
+)
+
+
+def create_tweet(_id, text, author, conversation_id, created_at, lang):
+    return Tweet(
+        id=_id,
+        text=text,
+        author=author,
+        conversation_id=conversation_id,
+        created_at=created_at,
+        lang=lang
+    )
+
+
+def create_user(_id, name, username, created_at, description, location, profile_image_url, protected, public_metrics,
+                url, verified):
+    return User(
+        id=_id,
+        name=name,
+        username=username,
+        created_at=created_at,
+        description=description,
+        location=location,
+        profile_image_url=profile_image_url,
+        protected=protected,
+        public_metrics=public_metrics,
+        url=url,
+        verified=verified
+    )
+
 
 class TestQueryValidData(TestCase):
     qs_mock = MockSet(
@@ -45,7 +89,7 @@ class TestTweetValidData(TestCase):
         Tweet(
             id=100,
             text='texto de prueba',
-            author_id=200,
+            author=qs_user_mock[0],
             conversation_id=300,
             created_at='01/01/2021',
             lang='es'
@@ -58,7 +102,7 @@ class TestTweetValidData(TestCase):
             use_case = TweetRegister(
                 _id=100,
                 text='texto de prueba',
-                author_id=200,
+                author=200,
                 conversation_id=300,
                 created_at='01/01/2021',
                 lang='es'
@@ -72,7 +116,7 @@ class TestTweetValidData(TestCase):
         use_case = TweetRegister(
             _id=100,
             text='texto de prueba',
-            author_id=200,
+            author=200,
             conversation_id=300,
             created_at='01/01/2021',
             lang='es'
@@ -82,23 +126,8 @@ class TestTweetValidData(TestCase):
 
 
 class TestUserValidData(TestCase):
-    qs_mock = MockSet(
-        User(
-            id=100,
-            name='name',
-            username='username',
-            created_at='01/01/2021',
-            profile_image_url='profile_image_url',
-            protected=True,
-            public_metrics='public_metrics',
-            verified=True,
-            description='description',
-            location='location',
-            url='url'
-        )
-    )
 
-    @patch.object(User.objects, 'find_by_id', return_value=qs_mock)
+    @patch.object(User.objects, 'find_by_id', return_value=qs_user_mock)
     def test_when_user_already_exists_raise_UserAlreadyExistError(self, mocked):
         with pytest.raises(UserAlreadyExistError):
             use_case = UserRegister(
@@ -164,51 +193,6 @@ class TestQueryRegisterExecute(TestCase):
         assert query.text == expected_result
 
 
-def create_tweet(_id, text, author_id, conversation_id, created_at, lang):
-    return Tweet(
-        id=_id,
-        text=text,
-        author=author_id,
-        conversation_id=conversation_id,
-        created_at=created_at,
-        lang=lang
-    )
-
-
-def create_user(_id, name, username, created_at, description, location, profile_image_url, protected, public_metrics,
-                url, verified):
-    return User(
-        id=_id,
-        name=name,
-        username=username,
-        created_at=created_at,
-        description=description,
-        location=location,
-        profile_image_url=profile_image_url,
-        protected=protected,
-        public_metrics=public_metrics,
-        url=url,
-        verified=verified
-    )
-
-
-qs_user_mock = MockSet(
-    User(
-        id=100,
-        name='name',
-        username='username',
-        created_at='01/01/2021',
-        profile_image_url='profile_image_url',
-        protected=True,
-        public_metrics='public_metrics',
-        verified=True,
-        description='description',
-        location='location',
-        url='url'
-    )
-)
-
-
 @patch.object(Tweet.objects, 'create_tweet', side_effect=create_tweet)  # we don't need to test django again
 @patch.object(TweetRegister, 'valid_data', return_value=None)  # already tested on TestValidData
 class TestTweetRegisterExecute(TestCase):
@@ -218,7 +202,7 @@ class TestTweetRegisterExecute(TestCase):
         self._use_case = TweetRegister(
             _id=100,
             text='texto de prueba',
-            author_id=qs_user_mock[0],
+            author=qs_user_mock[0],
             conversation_id=300,
             created_at='01/01/2021',
             lang='es'

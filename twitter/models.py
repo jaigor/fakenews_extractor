@@ -9,8 +9,7 @@ class UserManager(models.Manager):
         queryset = self.get_queryset()
         return queryset.filter(id=_id)
 
-    def add_tweet(self, _id, tweet):
-        user = self.find_by_id(_id).get()
+    def add_tweet(self, user, tweet):
         user.tweets.add(tweet)
 
     def get_all_users(self):
@@ -94,35 +93,43 @@ class TweetManager(models.Manager):
         queryset = self.get_queryset()
         return queryset.filter(id=_id)
 
-    def add_author(self, _id, user):
-        tweet = self.find_by_id(_id)
-        tweet.author = user
-
-    def create_tweet(self, _id, text, author_id, conversation_id, created_at, lang):
+    def create_tweet(self, _id, text, author, conversation_id, created_at, lang):
         tweet = Tweet.objects.create(
             id=_id,
             text=text,
-            author_id=author_id,
+            author=author,
             conversation_id=conversation_id,
             created_at=created_at,
             lang=lang)
         tweet.save()
         return tweet
 
-    def update_tweet(self, _id, text, author_id, conversation_id, created_at, lang):
+    def update_tweet(self, _id, text, author, conversation_id, created_at, lang):
         return Tweet.objects.find_by_id(_id).update(
             id=_id,
             text=text,
-            author_id=author_id,
+            author=author,
             conversation_id=conversation_id,
             created_at=created_at,
             lang=lang)
+
+    def get_all_tweets(self):
+        tweets = []
+        for tweet in Tweet.objects.all():
+            tweets.append([
+                tweet.text,
+                tweet.author.name,
+                tweet.conversation_id,
+                tweet.created_at,
+                tweet.lang
+            ])
+        return tweets
 
 
 class Tweet(models.Model):
     id = models.CharField(primary_key=True, max_length=120, unique=True)  # max_lenght = required
     text = models.TextField()
-    author = models.ForeignKey(User, null=True, on_delete=models.CASCADE, blank=True)
+    author = models.OneToOneField(User, on_delete=models.CASCADE)
     conversation_id = models.TextField()
     created_at = models.TextField()
     lang = models.CharField(null=True, max_length=5)
@@ -152,8 +159,7 @@ class QueryManager(models.Manager):
         query = self.find_by_id(_id).get()
         return query.tweets.all()
 
-    def add_tweet(self, text, tweet):
-        query = self.find_by_text(text).get()
+    def add_tweet(self, query, tweet):
         query.tweets.add(tweet)
 
     def get_tweets(self, _id):

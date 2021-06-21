@@ -32,7 +32,7 @@ def get_tweets_response(self, query):
 
 @shared_task(bind=True, throws=(TweetAlreadyExistError, UserAlreadyExistError, UserRequestError, TaskHandlerError),
              trail=True, name="register_tweets")
-def register_tweets(self, tweets, query):
+def register_tweets(self, tweets, query_text):
 
     try:
         count = 0
@@ -48,22 +48,21 @@ def register_tweets(self, tweets, query):
             else:
                 # get or create user
                 author_id = t['author_id']
-                user = User.objects.find_by_id(author_id)
-                if not user.exists():
+                userqs = User.objects.find_by_id(author_id)
+                if not userqs.exists():
                     register = UserResponseHandler(author_id)
-                    register.register_new_user()
+                    user = register.register_new_user()
+                else:
+                    user = User.objects.find_by_id(author_id).get()
 
-                # create tweet
-                _register_new_tweet(t)
-
-                # link user to tweet
-                user = User.objects.find_by_id(author_id)
-                Tweet.objects.add_author(tweet_id, user)
+                # create tweet # link user to tweet
+                _register_new_tweet(t, user)
+                tweet_qs = Tweet.objects.find_by_id(tweet_id)
 
                 # link tweet to the users list
-                tweet_qs = Tweet.objects.find_by_id(tweet_id)
-                User.objects.add_tweet(author_id, tweet_qs.get())
+                User.objects.add_tweet(user, tweet_qs.get())
 
+            query = Query.objects.find_by_text(query_text).get()
             # add existent or new tweet to query
             Query.objects.add_tweet(query, tweet_qs.get())
 
@@ -76,15 +75,15 @@ def register_tweets(self, tweets, query):
         raise TaskHandlerError(_(str(err)))
 
 
-def _register_new_tweet(t):
+def _register_new_tweet(t, user):
     # create tweet
     tweet = TweetRegister(
         _id=t['id'],
         text=t['text'],
         conversation_id=t['conversation_id'],
         created_at=t['created_at'],
-        lang=t['lang'],
-        author_id=None
+        author=user,
+        lang=t['lang']
     )
     tweet.execute()
 
@@ -119,7 +118,7 @@ class UserResponseHandler:
             url=url,
             tweet_id=None
         )
-        user.execute()
+        return user.execute()
 
     def _get_user_response(self):
         twitter = UserLookup(self._author_id)

@@ -65,15 +65,15 @@ class TweetRegister:
             text,
             conversation_id,
             created_at,
+            author,
             lang=None,
-            author_id=None
     ):
         self._id = _id
         self._text = text
         self._conversation_id = conversation_id
         self._created_at = created_at
         self._lang = lang
-        self._author_id = author_id
+        self._author = author
 
     def execute(self):
         tweet = self._create_tweet()
@@ -97,7 +97,7 @@ class TweetRegister:
         return Tweet.objects.create_tweet(
             _id=self._id,
             text=self._text,
-            author_id=self._author_id,
+            author=self._author,
             conversation_id=self._conversation_id,
             created_at=self._created_at,
             lang=self._lang)
