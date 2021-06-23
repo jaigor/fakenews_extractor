@@ -124,12 +124,8 @@ class TestModelsManager(TestCase):
 
         assert len(result) == len(self.query_object[0].tweets.all())
 
-    def test_query_add_tweet_and_count_them(self):
-        query = self._generate_query()
-        tweets_before = len(query.tweets.all())
+    @patch.object(Query.objects, 'find_by_id', return_value=qs_query_mock)
+    def test_query_with_no_tweets_return_empty_array(self, mocked):
+        result = Query.objects.get_tweets(100)
 
-        tweet = self._generate_tweet()
-        Query.objects.add_tweet(query, tweet)
-        tweets_now = len(query.tweets.all())
-
-        assert tweets_now == tweets_before + 1
+        assert [] == result

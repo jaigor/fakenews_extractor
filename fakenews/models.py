@@ -113,8 +113,8 @@ class PostManager(models.Manager):
 
 
 class Post(models.Model):
-    link = models.CharField(max_length=255, unique=True)
-    date = models.CharField(max_length=255)
-    title = models.CharField(max_length=255, default='')
+    link = models.CharField(max_length=256, unique=True)
+    date = models.CharField(max_length=256)
+    title = models.CharField(max_length=256, default='')
     content = models.TextField()
     objects = PostManager()

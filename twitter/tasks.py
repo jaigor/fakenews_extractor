@@ -41,6 +41,7 @@ def register_tweets(self, tweets, query_text):
 
         for t in tweets:
             # get or create tweet
+            print(t)
             tweet_id = t['id']
             tweet_qs = Tweet.objects.find_by_id(tweet_id)
             if tweet_qs.exists():
@@ -90,11 +91,8 @@ def _register_new_tweet(t, user):
 
 class UserResponseHandler:
 
-    def __init__(
-            self,
-            author_id
-    ):
-        self._author_id = author_id
+    def __init__(self, _id):
+        self._id = _id
 
     def register_new_user(self):
         user_response = self._get_user_response()
@@ -121,7 +119,7 @@ class UserResponseHandler:
         return user.execute()
 
     def _get_user_response(self):
-        twitter = UserLookup(self._author_id)
+        twitter = UserLookup(self._id)
         return twitter.search_user()
 
     def _fill_field(self, dictionary, attr):

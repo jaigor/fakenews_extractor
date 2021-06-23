@@ -5,6 +5,7 @@ import json
 
 from pages.downloader import Downloader
 
+
 # Custom Exceptions
 class TweetsRequestError(Exception):
     pass
@@ -38,7 +39,7 @@ class TwitterAPI(Downloader):
 
     def _connect_to_endpoint(self, url):
         response = requests.request("GET", url, headers=self._headers)
-        print(response.status_code)
+        #print(response.status_code)
         if response.status_code != 200:
             raise Exception(
                 "Request returned an error: {} {}".format(
@@ -77,7 +78,7 @@ class TweetLookup(TwitterAPI):
         try:
             url = self._create_tweet_url()
             json_response = self._connect_to_endpoint(url)
-            #print(json.dumps(json_response, indent=4, sort_keys=True))
+            # print(json.dumps(json_response, indent=4, sort_keys=True))
             return json_response['data']
 
         except (
@@ -120,10 +121,12 @@ class UserLookup(TwitterAPI):
         try:
             url = self._create_user_url()
             json_response = self._connect_to_endpoint(url)
-            # print(json.dumps(json_response, indent=4, sort_keys=True))
+            #print(json.dumps(json_response, indent=4, sort_keys=True))
+
             return json_response['data']
 
-        except requests.exceptions.RequestException:
+        except (requests.exceptions.RequestException,
+                KeyError):
             error_msg = (
                 'No se ha encontrado un Usuario de Twitter válido'
                 'Por favor, pruebe otra consulta'

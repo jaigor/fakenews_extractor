@@ -129,7 +129,7 @@ class TweetManager(models.Manager):
 class Tweet(models.Model):
     id = models.CharField(primary_key=True, max_length=120, unique=True)  # max_lenght = required
     text = models.TextField()
-    author = models.OneToOneField(User, on_delete=models.CASCADE)
+    author = models.OneToOneField('User', on_delete=models.CASCADE)
     conversation_id = models.TextField()
     created_at = models.TextField()
     lang = models.CharField(null=True, max_length=5)
@@ -184,7 +184,7 @@ class QueryManager(models.Manager):
 
 class Query(models.Model):
     text = models.CharField(max_length=256, unique=True)  # max_lenght = required
-    tweets = models.ManyToManyField(Tweet, blank=True)  # can be null = Empty
+    tweets = models.ManyToManyField('Tweet', blank=True)  # can be null = Empty
     objects = QueryManager()
     path_detail = "twitter:query-detail"
     path_update = "twitter:query-update"
