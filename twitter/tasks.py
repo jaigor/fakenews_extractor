@@ -41,7 +41,6 @@ def register_tweets(self, tweets, query_text):
 
         for t in tweets:
             # get or create tweet
-            print(t)
             tweet_id = t['id']
             tweet_qs = Tweet.objects.find_by_id(tweet_id)
             if tweet_qs.exists():

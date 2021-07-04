@@ -15,9 +15,3 @@ class FakeNewsForm(forms.ModelForm):
         fields = [
             'url'
         ]
-
-    def clean_url(self):
-        url = self.cleaned_data.get('url')
-        if not url.endswith('/'):
-            url += '/'
-        return url

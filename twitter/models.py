@@ -127,12 +127,19 @@ class TweetManager(models.Manager):
 
 
 class Tweet(models.Model):
+    TYPE_TEXT = (
+        ("1", "Fake"),
+        ("2", "True"),
+        ("3", "Unknown")
+    )
+
     id = models.CharField(primary_key=True, max_length=120, unique=True)  # max_lenght = required
     text = models.TextField()
     author = models.OneToOneField('User', on_delete=models.CASCADE)
     conversation_id = models.TextField()
     created_at = models.TextField()
     lang = models.CharField(null=True, max_length=5)
+    text_type = models.CharField(max_length=1, choices=TYPE_TEXT, default="3")
     objects = TweetManager()
 
     def get_absolute_url(self):

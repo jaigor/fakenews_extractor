@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.utils.translation import gettext as _
 
 import requests
@@ -69,6 +70,7 @@ class TweetLookup(TwitterAPI):
         tweet_fields = "tweet.fields={}&max_results={}".format(
             self._keys["tweet_fields"], self._keys["max_results"]
         )
+        print("query--> "+self._query)
         url = "https://api.twitter.com/2/tweets/search/recent?query={}&{}".format(
             self._query, tweet_fields
         )
@@ -83,10 +85,12 @@ class TweetLookup(TwitterAPI):
 
         except (
                 requests.exceptions.RequestException,
-                KeyError
+                KeyError,
+                Exception,
+                IntegrityError
         ):
             error_msg = (
-                'No se ha encontrado un tweet de Twitter válido'
+                'No se ha encontrado un tweet de Twitter válido. \n'
                 'Por favor, pruebe otra consulta'
             )
             raise TweetsRequestError(_(error_msg))
@@ -125,10 +129,14 @@ class UserLookup(TwitterAPI):
 
             return json_response['data']
 
-        except (requests.exceptions.RequestException,
-                KeyError):
+        except (
+                requests.exceptions.RequestException,
+                KeyError,
+                Exception,
+                IntegrityError
+        ):
             error_msg = (
-                'No se ha encontrado un Usuario de Twitter válido'
+                'No se ha encontrado un Usuario de Twitter válido. \n'
                 'Por favor, pruebe otra consulta'
             )
             raise UserRequestError(_(error_msg))

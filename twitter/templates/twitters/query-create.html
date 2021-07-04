@@ -1,11 +1,12 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %}Explicacion Twitter
 
 {% block content %}
 {% include 'twitters/twitter-header.html' %}
 {% load static %}
 <div class="container">
     <h1>Descarga Twitter</h1>
-    <p>Explicacion Twitter</p>
+    <p>Extractor de información de tweets, recogidos mediante la API de Twitter(v2), en base a un texto de búsqueda, y
+        recogiendo información relacionada con los perfiles de usuario y los mismos tweets publicados.</p>
     <hr class="my-4">
 
     <h2>Formulario</h2>
@@ -43,5 +44,11 @@
         });
         </script>
     </form>
+    <hr class="my-4">
+
+    <h2>Método de uso</h2>
+    <p>La consulta a introducir en el formulario buscará mediante la API de Twitter aquellos tweets que coincidan
+    con alguna/s palabras añadidas en el texto y registrará los tweets y los usuarios de los tweets a los que
+    pertenecen.</p>
 </div>
 {% endblock %}

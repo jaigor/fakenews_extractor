@@ -5,7 +5,8 @@
 {% load static %}
 <div class="container">
     <h1>Descarga Wordpress</h1>
-    <p>Explicacion pagina tipo wordpress</p>
+    <p>Extractor de información orientado a páginas web que usan el CMS Wordpress y que tienen activada la permisividad
+        de la API de manera pública.</p>
     <hr class="my-4">
 
     <h2>Formulario</h2>
@@ -43,5 +44,15 @@
         });
         </script>
     </form>
+<hr class="my-4">
+    <h2>Método de uso</h2>
+    <p>La forma de extraer posts de la web a escanear se basa en el uso que dispone la API pública de Wordpress.</p>
+    <p>Si se desea comprobar previamente que el uso de la API se encuentra activa en el dominio que usa el CMS
+        de Wordpress (ejemplo a díá de hoy: www.snopes.com), es necesario acudir a la página y añadir a su dominio el
+        siguiente path "/wp-json/wp/v2/". Si al acceder al path, la página web no muestra ningun error
+        (e.g. error 404, página no encontrada), sino que por el contrario se muestra un fichero de tipo JSON con los
+        datos sobre los diferentes endpoints, es posible extraer información sobre la misma.</p>
+    <p>Simplemente, para usar el formulario añada el dominio de la página a extraer información</p>
+
 </div>
 {% endblock %}

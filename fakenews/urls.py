@@ -34,6 +34,7 @@ urlpatterns = [
 
     path('wordpress/<int:pk>/downloadposts/', WordpressPostDownloadView.as_view(), name='wordpress-post-download'),
     path('wordpress/<int:pk>/listpost/', WordpressPostListView.as_view(), name='wordpress-post-list'),
+    path('wordpress/<int:pk>/listpost/textprocessor/<str:text>', WordpressPostListView.as_view(), name='wordpress-tweet-search'),
 
 
     path('soup/', SoupListView.as_view(), name='soup-list'),

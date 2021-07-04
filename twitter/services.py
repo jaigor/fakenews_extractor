@@ -2,6 +2,7 @@ from celery import chain
 from django.utils.translation import gettext as _
 
 from pages.downloader import Downloader
+from pages.text_processor import TextProcessor
 from .models import (
     Query
 )
@@ -85,6 +86,18 @@ class ResponseHandler:
         ) as err:
             raise ResponseHandlerError(_(str(err)))
 
+    def handle_search_response(self):
+        nouns = TextProcessor(self._query).extract_nouns()
+        print(nouns)
+
+        # join all query nouns
+        query = ' '.join(nouns)
+        # search for tweets
+        self._query = query
+
+        # handle the output
+        return self.handle_response()
+
     def get_queryset(self, _id):
         try:
             return Query.objects.get_tweet_queryset(_id)
@@ -106,8 +119,8 @@ class ResponseHandler:
         if not query_qs.exists():
             # Raise a meaningful error to be cached by the client
             error_msg = (
-                'No existe una Query con este texto {} '
-                'Por favor, pruebe otra consulta'
+                'No existe una Query con este texto {} \n'
+                '. Por favor, pruebe otra consulta'
             ).format(self._query)
 
             raise QueryDoesNotExistError(_(error_msg))

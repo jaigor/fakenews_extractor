@@ -122,13 +122,13 @@ def _register_new_wordpress(url, post_type):
                      FakeNewsAlreadyExistError, SoupAlreadyExistError, FakeNewsDoesNotExistError,
                      SoupDoesNotExistError, NoSoupTypeError, NoLinksFoundError),
              trail=True, name="register_new_soup_posts")
-def register_soup_posts(self, url, link_class, date_type, date_id, is_update):
+def register_soup_posts(self, url, link_class, date_type, date_id, body_class, is_update):
     try:
         progress_recorder = ProgressRecorder(self)
         progress_recorder.set_progress(0, 100)
 
         # get all links
-        api = Scrapper(url, link_class, date_type, date_id)
+        api = Scrapper(url, link_class, date_type, date_id, body_class)
         links = api.get_collection()
         progress_recorder.set_progress(40, 100)
         # if no failure, register soup

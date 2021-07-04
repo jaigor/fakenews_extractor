@@ -2,7 +2,6 @@ from celery_progress.backend import ProgressRecorder
 from django_mock_queries.query import MockSet
 from django.test import TestCase
 from mock import patch
-import pytest
 
 from twitter.models import User, Tweet, Query
 from twitter.register import UserRegister, TweetRegister
@@ -47,7 +46,8 @@ class TestWordpressTasks(TestCase):
     expected_tweets = {
         'created_at': '2021-06-23T10:10:48.000Z', 'id': '1407642286956056579',
         'conversation_id': '1407642286956056579',
-        'text': "RT @DaysForGirls: How does #menstrualequity relate to #selfcare? Join DfG, @washunited &amp; @MietAfrica next week as we kick off this year's S…",
+        'text': "RT @DaysForGirls: How does #menstrualequity relate to #selfcare? Join DfG, @washunited &amp; "
+                "@MietAfrica next week as we kick off this year's S…",
         'lang': 'en', 'author_id': '1398144816223948803'
     }
 

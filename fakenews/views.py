@@ -118,7 +118,8 @@ class SoupCreateView(FakeNewsCreateView):
             form.cleaned_data['url'],
             form.cleaned_data['link_class'],
             form.cleaned_data['date_type'],
-            form.cleaned_data['date_id']
+            form.cleaned_data['date_id'],
+            form.cleaned_data['body_class']
         )
         # handle the output
         try:
@@ -141,7 +142,8 @@ class SoupUpdateView(FakeNewsUpdateView):
             form.cleaned_data['url'],
             form.cleaned_data['link_class'],
             form.cleaned_data['date_type'],
-            form.cleaned_data['date_id']
+            form.cleaned_data['date_id'],
+            form.cleaned_data['body_class']
         )
         # handle the output
         try:

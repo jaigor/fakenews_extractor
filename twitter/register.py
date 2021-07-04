@@ -40,8 +40,8 @@ class QueryRegister:
         query_qs = Query.objects.find_by_text(self._text)
         if query_qs.exists():
             error_msg = (
-                'Ya existe una consulta igual con el texto {} '
-                'Por favor, pruebe otra consulta'
+                'Ya existe una consulta igual con el texto {} \n'
+                '. Por favor, pruebe otra consulta'
             ).format(self._text)
 
             raise QueryAlreadyExistError(_(error_msg))
@@ -84,8 +84,8 @@ class TweetRegister:
         tweet_qs = Tweet.objects.find_by_id(self._id)
         if tweet_qs.exists():
             error_msg = (
-                'Ya existe un tweet con ese id {} '
-                'Por favor, pruebe otro'
+                'Ya existe un tweet con ese id {} \n'
+                '. Por favor, pruebe otro'
             ).format(self._id)
 
             raise TweetAlreadyExistError(_(error_msg))
@@ -143,8 +143,8 @@ class UserRegister:
         user_qs = User.objects.find_by_id(self._id)
         if user_qs.exists():
             error_msg = (
-                'Ya existe un usuario con ese id {} '
-                'Por favor, pruebe otro'
+                'Ya existe un usuario con ese id {} \n'
+                '. Por favor, pruebe otro'
             ).format(self._id)
 
             raise UserAlreadyExistError(_(error_msg))

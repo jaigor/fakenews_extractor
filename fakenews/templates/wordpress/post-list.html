@@ -7,7 +7,7 @@
     <h1>Listados Posts</h1>
     <p>A continuación, se muestran todos los posts pertenecientes al wordpress seleccionado.</p>
     <p>Acciones disponibles: </p>
-    <ul>        
+    <ul>
         <li><a href={{ fakenews.get_update_url }}>Actualizar <img src="{% static 'arrow-counterclockwise.svg' %}" alt="update" width="16" height="16"> </a></li>
         {% if posts %}
             <li> <a href={{ fakenews.get_download_posts_url }}>Descargar <img src="{% static 'cloud-arrow-down.svg' %}" alt="download" width="16" height="16"> </a></li>
@@ -19,7 +19,7 @@
     <p>Listado de posts almacenados:</p>
     <ul>
         {% for post in posts  %}
-            <li>{{ post.title }}</li>
+            <li><a href="{% url 'twitter:tweet-create-text' text=post.title %}">{{ post.title }} <img src="{% static 'Twitter_icon.svg' %}" alt="update" width="16" height="16"> </a></li>
         {% empty %}
             <li>No hay posts registrados.</li>
         {% endfor %}

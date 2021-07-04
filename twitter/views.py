@@ -189,3 +189,36 @@ class TweetListView(SocialListView):
     response_handler = ResponseHandler
     parent_model = Query
     object_name = 'query'
+
+
+class TweetAutoCreateView(TweetCreateView):
+
+    def __init__(self):
+        super().__init__()
+        self.context = {}
+
+    # GET Method
+    def get(self, request, *args, **kwargs):
+        # twitter search
+        if len(self.kwargs) > 0:
+            try:
+                self.template_name = 'twitters/query-create.html'
+                # get the input and delegate to process
+                self._run_search_handler(self.kwargs['text'])
+                return render(request, self.template_name, self.context)
+            except ResponseHandlerError as err:
+                context = {
+                    'message': str(err)
+                }
+                return render(request, self.error_template_name, context)
+        else:
+            return HttpResponseRedirect(reverse('twitter:query-list'))
+
+    def _run_search_handler(self, text):
+        print(text)
+        handler = ResponseHandler(
+            text
+        )
+        # handle the output
+        result = handler.handle_search_response()
+        self.context['task_ids'] = [result, result.parent]

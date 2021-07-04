@@ -40,22 +40,24 @@ class Wordpress(FakeNews):
 # SOUP TYPE #
 class SoupManager(FakeNewsManager):
 
-    def create_soup(self, url, link_class, date_type, date_id):
+    def create_soup(self, url, link_class, date_type, date_id, body_class=None):
         soup = Soup.objects.create(
             url=url,
             link_class=link_class,
             date_type=date_type,
             date_id=date_id,
+            body_class=body_class
         )
         soup.save()
         return soup
 
-    def update_soup(self, url, link_class, date_type, date_id):
+    def update_soup(self, url, link_class, date_type, date_id, body_class=None):
         return Soup.objects.find_by_url(url).update(
             url=url,
             link_class=link_class,
             date_type=date_type,
             date_id=date_id,
+            body_class=body_class
         )
 
 
@@ -67,6 +69,7 @@ class Soup(FakeNews):
     link_class = models.CharField(max_length=120)  # max_lenght = required
     date_type = models.CharField(max_length=1, choices=ATTR_CHOICES)
     date_id = models.CharField(max_length=120)
+    body_class = models.CharField(max_length=120, null=True, blank=True)
     objects = SoupManager()
     path_detail = "fakenews:soup-detail"
     path_update = "fakenews:soup-update"
@@ -111,6 +114,13 @@ class PostManager(models.Manager):
 
         return posts
 
+    def get_all_posts_titles(self):
+        titles = []
+        for post in Post.objects.all():
+            titles.append(post.title)
+
+        return titles
+
 
 class Post(models.Model):
     link = models.CharField(max_length=256, unique=True)
@@ -118,3 +128,6 @@ class Post(models.Model):
     title = models.CharField(max_length=256, default='')
     content = models.TextField()
     objects = PostManager()
+
+    def __str__(self):
+        return "%s - %s" % (self.pk, self.title)

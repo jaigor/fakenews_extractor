@@ -19,7 +19,7 @@
     <p>Listado de posts almacenados:</p>
     <ul>
         {% for post in posts  %}
-            <li>{{ post.title }}</li>
+            <li><a href="{% url 'twitter:tweet-create-text' text=post.title %}">{{ post.title }} <img src="{% static 'Twitter_icon.svg' %}" alt="update" width="16" height="16"> </a></li>
         {% empty %}
             <li>No hay posts registrados.</li>
         {% endfor %}

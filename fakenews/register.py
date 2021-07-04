@@ -29,12 +29,13 @@ class WordpressRegister(FakeNewsRegister):
 
 class SoupRegister(FakeNewsRegister):
 
-    def __init__(self, url, link_class, date_type, date_id):
+    def __init__(self, url, link_class, date_type, date_id, body_class=None):
         super().__init__(url)
         self._url = url
         self._link_class = link_class
         self._date_type = date_type
         self._date_id = date_id
+        self._body_class = body_class
         self._model = Soup
 
     def _create_fakenews(self):
@@ -43,6 +44,7 @@ class SoupRegister(FakeNewsRegister):
             self._link_class,
             self._date_type,
             self._date_id,
+            self._body_class
         )
 
     def update_fakenews(self):
@@ -51,4 +53,5 @@ class SoupRegister(FakeNewsRegister):
             self._link_class,
             self._date_type,
             self._date_id,
+            self._body_class
         )

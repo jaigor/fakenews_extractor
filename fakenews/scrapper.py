@@ -26,7 +26,7 @@ class TooManyRequestError(Exception):
 
 class Scrapper(Downloader):
 
-    def __init__(self, basepath, linkClass=None, dateType=None, dateId=None):
+    def __init__(self, basepath, linkClass=None, dateType=None, dateId=None, body_class=None):
         super().__init__()
         with open("fakenews/config.json", "r") as f:
             _keys = json.load(f)
@@ -38,12 +38,14 @@ class Scrapper(Downloader):
             self._linkClass = linkClass
             self._dateType = dateType
             self._dateId = dateId
+            self._body_class = body_class
 
     def get_collection(self):
         links = []
         # collection (from 0 or 1 to N)
         page = 0
         try:
+            print(self._basepath + str(page))
             r0 = requests.get(self._basepath + str(page))
             # 0 can be throw error, so test it for results
             if r0.status_code == 200:  # success
@@ -51,6 +53,7 @@ class Scrapper(Downloader):
 
             # and continue with 1
             page = 1
+            print(self._basepath + str(page))
             r1 = requests.get(self._basepath + str(page))
 
             # no pages found
@@ -109,21 +112,26 @@ class Scrapper(Downloader):
 
     def _add_links(self, html_doc, links):
         soup = BeautifulSoup(html_doc, 'html.parser')
-        # search by class link
-        # base domain
+        # base domain in case the need to add to post url
         parsed_uri = urlparse(self._basepath)
         domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
         # delete last character if exists
         if domain.endswith('/'):
             domain = domain[:-1]
 
+        # search by class link
         # add all links to previous list
         divs = soup.find_all('div', class_=self._linkClass)
         for div in divs:
-            # didn't find link
+            # did find link
             if div.a is not None:
-                links.append(domain + div.a['href'])
-
+                # check if has protocol
+                if div.a['href'].startswith('/'):
+                    print(domain + div.a['href'])
+                    links.append(domain + div.a['href'])
+                else:
+                    print(div.a['href'])
+                    links.append(div.a['href'])
         return links
 
     def _get_title(self, soup):
@@ -143,16 +151,22 @@ class Scrapper(Downloader):
             return "No Title"
 
     def _get_body(self, soup):
-        divs = soup.find_all('div')
-        max = 1
         body = ""
-        for i in range(len(divs)):
-            if len(divs[i]) > max:
-                body = divs[i]
-                max = len(divs[i])
-        if max > 1:
-            return body.get_text()
-        return body
+        # check if body is not blank
+        if self._body_class is not None:
+            # search by class div
+            body = soup.find_all('div', class_=self._body_class)
+            return body
+        else:
+            divs = soup.find_all('div')
+            max = 1
+            for i in range(len(divs)):
+                if len(divs[i]) > max:
+                    body = divs[i]
+                    max = len(divs[i])
+            if max > 1:
+                return body.get_text()
+            return body
 
     def _get_date(self, soup):
         html = ""

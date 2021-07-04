@@ -15,5 +15,5 @@ class QueryCreateForm(forms.ModelForm):
             'query'
         ]
 
-    def clean_url(self):
+    def clean_query(self):
         return self.cleaned_data.get('query')

@@ -73,19 +73,20 @@ class WordpressResponseHandler(FakeNewsResponseHandler):
 # Soup #
 class SoupResponseHandler(FakeNewsResponseHandler):
 
-    def __init__(self, url=None, link_class=None, date_type=None, date_id=None):
+    def __init__(self, url=None, link_class=None, date_type=None, date_id=None, body_class=None):
         super().__init__(url)
         self._url = url
         self._link_class = link_class
         self._date_type = date_type
         self._date_id = date_id
+        self._body_class = body_class
         self._model = Soup
         self._exception_not_exist = SoupDoesNotExistError
 
     def _handle(self):
         result = None
         try:
-            result = register_soup_posts.s(self._url, self._link_class, self._date_type, self._date_id,
+            result = register_soup_posts.s(self._url, self._link_class, self._date_type, self._date_id, self._body_class,
                                            False).apply_async()
             return result
         except SoupAlreadyExistError as err:
@@ -98,7 +99,7 @@ class SoupResponseHandler(FakeNewsResponseHandler):
     def _update(self):
         result = None
         try:
-            result = register_soup_posts.s(self._url, self._link_class, self._date_type, self._date_id,
+            result = register_soup_posts.s(self._url, self._link_class, self._date_type, self._date_id, self._body_class,
                                            True).apply_async()
             return result
         except self._exception_not_exist as err:

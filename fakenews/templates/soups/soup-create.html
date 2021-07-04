@@ -5,7 +5,9 @@
 {% load static %}
 <div class="container">
     <h1>Descarga Scrapping</h1>
-    <p>Explicacion pagina tipo Scrapping</p>
+    <p>Extractor de información orientado a páginas web que contienen artículos, a modo de noticias, y que siguen un
+        patrón orientado a elementos HTML y/o CSS en cuanto a la identificación de sus enlaces, título de los artículos
+        y fecha de los mismos.</p>
     <hr class="my-4">
 
     <h2>Formulario</h2>
@@ -33,6 +35,23 @@
         </script>
         {% endif %}
     </form>
-    <hr class="my-4">    
+    <hr class="my-4">
+
+    <h2>Método de uso</h2>
+    <p>La forma de extraer posts de la web a escanear se basa en el seguimiento de un patrón que debe mantener la
+        página web. El patrón es el que suelen mantener páginas de tipo de publicación de noticias o artículos,
+        como los blogs, o las páginas de fact-checking, en las que existe una sección de la web en las que las
+        noticias se van segmentando por listados o subpáginas, a modo de catálogo, las cuáles suelen estar numeradas
+        de 0/1 a n páginas.</p>
+    <p>El primer campo del formulario equivale al dominio de la web, el segundo campo llamado "Clase Link" representa
+        el elemento HTML de tipo div con la clase CSS o de la hoja de estilos (se recomienda inspeccionar el DOM)
+        con las que se clasifican los posts o noticias al ser listados por la web.
+        Para que la primera parte de extracción funcione, los posts deben estar englobados en esa clase y que dentro
+        de ese elemento (div) exista un enlace o etiqueta HTML que lo representa.</p>
+    <p>El tercer y cuarto campo equivalen al contenido del propio post, en los que se registra la fecha del post,
+        el elemento HTML que engloba a la fecha puede estar identificado mediante un id o clase, dependiendo de la
+        página se deberá especificar en estos campos de cual se trata y de que nombre usa.</p>
+    <p>El quinto campo es opcional, y equivale a la clase del elemento div del body o cuerpo del mensaje, en el que
+        se debe rellenar cuando el contenedor del post no es el contenedor más grande en contenido por palabras.</p>
 </div>
 {% endblock %}

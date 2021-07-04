@@ -10,6 +10,12 @@ class WordpressCreateForm(FakeNewsForm):
             'url'
         ]
 
+    def clean_url(self):
+        url = self.cleaned_data.get('url')
+        if not url.endswith('/'):
+            url += '/'
+        return url
+
 
 class WordpressUpdateForm(FakeNewsForm):
 
@@ -24,6 +30,12 @@ class WordpressUpdateForm(FakeNewsForm):
             'url',
             'post_type'
         ]
+
+    def clean_url(self):
+        url = self.cleaned_data.get('url')
+        if not url.endswith('/'):
+            url += '/'
+        return url
 
     def clean_post_type(self):
         post_type = self.cleaned_data.get('post_type')
@@ -50,6 +62,11 @@ class SoupCreateForm(FakeNewsForm):
         label='Atributo Fecha',
         max_length=120,
         widget=forms.TextInput(attrs={'class': 'form-control'}))
+    body_class = forms.CharField(
+        label='Clase Cuerpo',
+        max_length=120,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = Soup
@@ -57,7 +74,8 @@ class SoupCreateForm(FakeNewsForm):
             'url',
             'link_class',
             'date_type',
-            'date_id'
+            'date_id',
+            'body_class'
         ]
 
     def clean_link_class(self):
@@ -68,3 +86,6 @@ class SoupCreateForm(FakeNewsForm):
 
     def clean_date_id(self):
         return self.cleaned_data.get('date_id')
+
+    def clean_body_class(self):
+        return self.cleaned_data.get('body_class')
