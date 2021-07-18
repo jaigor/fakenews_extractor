@@ -19,7 +19,13 @@ class TestWordpressForms(TestCase):
 
     def test_create_when_all_fields_are_filled_up_and_the_form_is_valid(self):
         data = {
-            'url': 'https://www.snopes.com/'
+            'url': 'https://www.snopes.com/',
+            'f_source_type': '1',
+            'f_source_pattern': None,
+            'f_source_entire_link': '1',
+            's_source_type': '1',
+            's_source_pattern': None,
+            's_source_entire_link': '1'
         }
 
         form = WordpressCreateForm(data=data)
@@ -37,7 +43,13 @@ class TestWordpressForms(TestCase):
     def test_update_when_all_fields_are_filled_up_and_the_form_is_valid(self):
         data = {
             'url': 'https://www.snopes.com/',
-            'post_type': 'posts'
+            'post_type': 'posts',
+            'f_source_type': '1',
+            'f_source_pattern': None,
+            'f_source_entire_link': '1',
+            's_source_type': '1',
+            's_source_pattern': None,
+            's_source_entire_link': '1'
         }
 
         form = WordpressUpdateForm(data=data)
@@ -51,7 +63,13 @@ class TestSoupForms(TestCase):
             'url': 'https://www.snopes.com/',
             'link_class': 'class',
             'date_type': "1",
-            'date_id': 'dateid'
+            'date_id': 'dateid',
+            'f_source_type': '1',
+            'f_source_pattern': None,
+            'f_source_entire_link': '1',
+            's_source_type': '1',
+            's_source_pattern': None,
+            's_source_entire_link': '1'
         }
 
         form = SoupCreateForm(data=data)
@@ -71,7 +89,13 @@ class TestSoupForms(TestCase):
             'url': 'https://www.snopes.com/',
             'link_class': 'class',
             'date_type': 'a',
-            'date_id': 'dateid'
+            'date_id': 'dateid',
+            'f_source_type': '1',
+            'f_source_pattern': None,
+            'f_source_entire_link': '1',
+            's_source_type': '1',
+            's_source_pattern': None,
+            's_source_entire_link': '1',
         }
 
         form = SoupCreateForm(data=data)

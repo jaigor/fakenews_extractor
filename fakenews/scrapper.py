@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 import time
 import json
 
+from fakenews.url_extractor import UrlExtractor
 from pages.downloader import Downloader
 
 
@@ -95,11 +96,13 @@ class Scrapper(Downloader):
 
         return links
 
-    def get_posts_content(self, links):
+    def get_posts_content(self, links, url_nodes=None):
         try:
             posts = []
             for link in links:
-                posts.append(self._get_fields(link))
+                fields = self._get_fields(link)
+                fields.append(UrlExtractor(fields[3], url_nodes).get_source_links())
+                posts.append(fields)
                 time.sleep(self._TimeBetweenReq)
 
             return posts
@@ -122,6 +125,7 @@ class Scrapper(Downloader):
         # search by class link
         # add all links to previous list
         divs = soup.find_all('div', class_=self._linkClass)
+        print("links")
         for div in divs:
             # did find link
             if div.a is not None:

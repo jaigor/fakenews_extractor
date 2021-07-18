@@ -32,8 +32,19 @@ def propagate_chain_get(terminal_node, timeout=None):
 # Wordpress #
 class WordpressResponseHandler(FakeNewsResponseHandler):
 
-    def __init__(self, url=None):
-        super().__init__(url)
+    def __init__(self,
+                 url=None,
+                 f_source_type=None,
+                 f_source_pattern=None,
+                 f_source_entire_link=None,
+
+                 s_source_type=None,
+                 s_source_pattern=None,
+                 s_source_entire_link=None,
+                 ):
+        super().__init__(url,
+                         f_source_type, f_source_pattern, f_source_entire_link,
+                         s_source_type, s_source_pattern, s_source_entire_link)
         self._url = url
         self._model = Wordpress
         self._exception_not_exist = WordpressDoesNotExistError
@@ -42,13 +53,13 @@ class WordpressResponseHandler(FakeNewsResponseHandler):
         result = None
         try:
             result = chain(get_wordpress_urls.s(self._url, False),
-                           register_wordpress_list_posts.s()).apply_async()
+                           register_wordpress_list_posts.s(self._f_source_pattern, self._f_source_type,
+                                                           self._f_source_entire_link,
+                                                           self._s_source_pattern, self._s_source_type,
+                                                           self._s_source_entire_link)).apply_async()
             propagate_chain_get(result)
             return result
-        except WordpressAlreadyExistError as err:
-            result.revoke()
-            raise FakeNewsAlreadyExistError(_(str(err)))
-        except FakeNewsAlreadyExistError as err:
+        except (WordpressAlreadyExistError, FakeNewsAlreadyExistError) as err:
             result.revoke()
             raise FakeNewsAlreadyExistError(_(str(err)))
 
@@ -56,13 +67,13 @@ class WordpressResponseHandler(FakeNewsResponseHandler):
         result = None
         try:
             result = chain(get_wordpress_urls.s(self._url, True),
-                           register_wordpress_list_posts.s()).apply_async()
+                           register_wordpress_list_posts.s(self._f_source_pattern, self._f_source_type,
+                                                           self._f_source_entire_link,
+                                                           self._s_source_pattern, self._s_source_type,
+                                                           self._s_source_entire_link)).apply_async()
             propagate_chain_get(result)
             return result
-        except self._exception_not_exist as err:
-            result.revoke()
-            raise FakeNewsDoesNotExistError(_(str(err)))
-        except FakeNewsDoesNotExistError as err:
+        except (self._exception_not_exist, FakeNewsDoesNotExistError) as err:
             result.revoke()
             raise FakeNewsDoesNotExistError(_(str(err)))
 
@@ -73,8 +84,23 @@ class WordpressResponseHandler(FakeNewsResponseHandler):
 # Soup #
 class SoupResponseHandler(FakeNewsResponseHandler):
 
-    def __init__(self, url=None, link_class=None, date_type=None, date_id=None, body_class=None):
-        super().__init__(url)
+    def __init__(self,
+                 url=None,
+                 f_source_type=None,
+                 f_source_pattern=None,
+                 f_source_entire_link=None,
+
+                 s_source_type=None,
+                 s_source_pattern=None,
+                 s_source_entire_link=None,
+
+                 link_class=None,
+                 date_type=None,
+                 date_id=None,
+                 body_class=None):
+        super().__init__(url,
+                         f_source_type, f_source_pattern, f_source_entire_link,
+                         s_source_type, s_source_pattern, s_source_entire_link)
         self._url = url
         self._link_class = link_class
         self._date_type = date_type
@@ -86,26 +112,28 @@ class SoupResponseHandler(FakeNewsResponseHandler):
     def _handle(self):
         result = None
         try:
-            result = register_soup_posts.s(self._url, self._link_class, self._date_type, self._date_id, self._body_class,
-                                           False).apply_async()
+            result = register_soup_posts.s(
+                False, self._url, self._link_class, self._date_type, self._date_id, self._body_class,
+                self._f_source_pattern, self._f_source_type,
+                self._f_source_entire_link,
+                self._s_source_pattern, self._s_source_type,
+                self._s_source_entire_link).apply_async()
             return result
-        except SoupAlreadyExistError as err:
-            result.revoke()
-            raise FakeNewsAlreadyExistError(_(str(err)))
-        except FakeNewsAlreadyExistError as err:
+        except (SoupAlreadyExistError, FakeNewsAlreadyExistError) as err:
             result.revoke()
             raise FakeNewsAlreadyExistError(_(str(err)))
 
     def _update(self):
         result = None
         try:
-            result = register_soup_posts.s(self._url, self._link_class, self._date_type, self._date_id, self._body_class,
-                                           True).apply_async()
+            result = register_soup_posts.s(
+                True, self._url, self._link_class, self._date_type, self._date_id, self._body_class,
+                self._f_source_pattern, self._f_source_type,
+                self._f_source_entire_link,
+                self._s_source_pattern, self._s_source_type,
+                self._s_source_entire_link).apply_async()
             return result
-        except self._exception_not_exist as err:
-            result.revoke()
-            raise FakeNewsDoesNotExistError(_(str(err)))
-        except FakeNewsDoesNotExistError as err:
+        except (self._exception_not_exist, FakeNewsDoesNotExistError) as err:
             result.revoke()
             raise FakeNewsDoesNotExistError(_(str(err)))
 

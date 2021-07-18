@@ -4,6 +4,7 @@ import requests
 import time
 import json
 
+from fakenews.url_extractor import UrlExtractor
 from pages.downloader import Downloader
 
 
@@ -77,7 +78,7 @@ class WordpressAPI(Downloader):
             ).format(url)
             raise NoOKResponseError(_(error_msg))
 
-    def get_posts_content(self, url):
+    def get_posts_content(self, url, url_nodes=None):
         posts = []
         # Wordpress module
         # iterate for each post
@@ -86,7 +87,9 @@ class WordpressAPI(Downloader):
 
         while r.status_code == 200 and page < self._pageMAX:
             for post in r.json():
-                posts.append(self._get_post_fields(post))
+                fields = self._get_post_fields(post)
+                fields.append(UrlExtractor(fields[3], url_nodes).get_source_links())
+                posts.append(fields)
 
             page += 1
             time.sleep(self._TimeBetweenReq)

@@ -13,8 +13,64 @@
     <p>Rellene los datos del formulario para obtener la información:</p>
     <form action='.' method='POST'>  {% csrf_token %}
         <div class="mb-3">
-            {{ form }}
+            <div class="form-group">
+                {{ form.url.errors }}
+                {{ form.url.label_tag }}
+                {{ form.url }}
+            </div>
+            <hr class="my-3">
+            <fieldset>
+            <div>
+               <p>Enlace a la fuente de fakenews (Opcional)</p>
+                <h3>Primer Enlace</h3>
+               <div class="row">
+                  <div class="col-2">
+                    {{ form.f_source_type.errors }}
+                    {{ form.f_source_type.label_tag }}
+                    {{ form.f_source_type }}
+                  </div>
+                   <div class="col-6">
+                    {{ form.f_source_pattern.errors }}
+                    {{ form.f_source_pattern.label_tag }}
+                    {{ form.f_source_pattern }}
+                  </div>
+                   <div class="col-2" id="f_entire_link">
+                    {{ form.f_source_entire_link.errors }}
+                    {{ form.f_source_entire_link.label_tag }}
+                    {% for radio in form.f_source_entire_link %}
+                        <div class="form-check">
+                            {{ radio }}
+                        </div>
+                    {% endfor %}
+                  </div>
+                </div>
+                <h3>Segundo Enlace</h3>
+                <div class="row">
+                  <div class="col-2">
+                    {{ form.s_source_type.errors }}
+                    {{ form.s_source_type.label_tag }}
+                    {{ form.s_source_type }}
+                  </div>
+                   <div class="col-6">
+                    {{ form.s_source_pattern.errors }}
+                    {{ form.s_source_pattern.label_tag }}
+                    {{ form.s_source_pattern }}
+                  </div>
+                    <div class="col-2" id="s_entire_link">
+                    {{ form.s_source_entire_link.errors }}
+                    {{ form.s_source_entire_link.label_tag }}
+                    {% for radio in form.s_source_entire_link %}
+                        <div class="form-check">
+                            {{ radio }}
+                        </div>
+                    {% endfor %}
+                  </div>
+                </div>
+            </div>
+            </fieldset>
+
         </div>
+
         <input type='submit' value='Crear' class="btn btn-primary"/>
 
         {% for task_id in task_ids %}
@@ -55,4 +111,6 @@
     <p>Simplemente, para usar el formulario añada el dominio de la página a extraer información</p>
 
 </div>
+
+<script src="{% static 'forms.js' %}"></script>
 {% endblock %}

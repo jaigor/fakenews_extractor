@@ -12,7 +12,7 @@ from twitter.models import (
 class TestModelsManager(TestCase):
     user_object = [
         User(
-            id=100,
+            user_id=100,
             name='name',
             username='username',
             created_at='01/01/2021',
@@ -28,7 +28,7 @@ class TestModelsManager(TestCase):
     qs_user_mock = MockSet(user_object[0])
     tweet_object = [
         Tweet(
-            id=100,
+            tweet_id=100,
             text='texto de prueba',
             author=user_object[0],
             conversation_id=300,

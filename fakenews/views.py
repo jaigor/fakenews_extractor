@@ -41,7 +41,14 @@ class WordpressCreateView(FakeNewsCreateView):
 
     def _run_handler(self, form):
         handler = WordpressResponseHandler(
-            form.cleaned_data['url']
+            form.cleaned_data['url'],
+            form.cleaned_data['f_source_type'],   # first
+            form.cleaned_data['f_source_pattern'],
+            form.cleaned_data['f_source_entire_link'],
+
+            form.cleaned_data['s_source_type'],  # second
+            form.cleaned_data['s_source_pattern'],
+            form.cleaned_data['s_source_entire_link'],
         )
         try:
             result = handler.handle_response()
@@ -116,6 +123,14 @@ class SoupCreateView(FakeNewsCreateView):
     def _run_handler(self, form):
         handler = SoupResponseHandler(
             form.cleaned_data['url'],
+            form.cleaned_data['f_source_type'],  # first
+            form.cleaned_data['f_source_pattern'],
+            form.cleaned_data['f_source_entire_link'],
+
+            form.cleaned_data['s_source_type'],  # second
+            form.cleaned_data['s_source_pattern'],
+            form.cleaned_data['s_source_entire_link'],
+
             form.cleaned_data['link_class'],
             form.cleaned_data['date_type'],
             form.cleaned_data['date_id'],

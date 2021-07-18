@@ -62,12 +62,14 @@ class PostRegister:
             date,
             link,
             title,
-            content
+            content,
+            source_urls
     ):
         self._date = date
         self._link = link
         self._title = title
         self._content = content
+        self._source_urls = source_urls
 
     def execute(self):
         # exists = update
@@ -98,15 +100,17 @@ class PostRegister:
             link=self._link,
             title=self._title,
             content=self._content,
+            urls=self._source_urls
         )
 
     def update_post(self):
         self.valid_post()
-        Post.objects.find_by_link(self._link).update(
+        Post.objects.update_post(
             date=self._date,
             link=self._link,
             title=self._title,
             content=self._content,
+            urls=self._source_urls
         )
 
     def valid_post(self):

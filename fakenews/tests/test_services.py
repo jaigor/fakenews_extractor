@@ -16,7 +16,8 @@ def generate_post():
         link="www.wordpress.com/posts/1",
         date="01/01/2021",
         title="Post",
-        content="Post Content"
+        content="Post Content",
+        fake_news_sources=dict
     )
 
 
@@ -24,11 +25,13 @@ def generate_posts():
     return [["01/01/2021",
              "www.wordpress.com/posts/1",
              "Post",
-             "Post Content"],
+             "Post Content",
+             None],
             ["01/01/2021",
              "www.wordpress.com/posts/2",
              "Post2",
-             "Post2 Content"]]
+             "Post2 Content",
+             None]]
 
 
 def generate_wordpress():
@@ -81,7 +84,8 @@ class TestPostsResponseHandler(TestCase):
             date="01/01/2021",
             link="www.wordpress.com/posts/2",
             title="Post2",
-            content="Post2 Content")
+            content="Post2 Content",
+            source_urls=None)
 
     @patch.object(Post.objects, 'find_by_link', return_value=MockSet())
     @patch.object(PostRegister, 'execute', side_effect=PostAlreadyExistError("error"))

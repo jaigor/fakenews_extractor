@@ -4,11 +4,18 @@ from .base_forms import FakeNewsForm
 
 
 class WordpressCreateForm(FakeNewsForm):
+
     class Meta(FakeNewsForm.Meta):
         model = Wordpress
         fields = [
-            'url'
-        ]
+            'url',
+            'f_source_type',
+            'f_source_pattern',
+            'f_source_entire_link',
+            's_source_type',
+            's_source_pattern',
+            's_source_entire_link'
+            ]
 
     def clean_url(self):
         url = self.cleaned_data.get('url')
@@ -28,7 +35,13 @@ class WordpressUpdateForm(FakeNewsForm):
         model = Wordpress
         fields = [
             'url',
-            'post_type'
+            'post_type',
+            'f_source_type',
+            'f_source_pattern',
+            'f_source_entire_link',
+            's_source_type',
+            's_source_pattern',
+            's_source_entire_link'
         ]
 
     def clean_url(self):
@@ -72,10 +85,16 @@ class SoupCreateForm(FakeNewsForm):
         model = Soup
         fields = [
             'url',
+            'f_source_type',
+            'f_source_pattern',
+            'f_source_entire_link',
+            's_source_type',
+            's_source_pattern',
+            's_source_entire_link',
             'link_class',
             'date_type',
             'date_id',
-            'body_class'
+            'body_class',
         ]
 
     def clean_link_class(self):

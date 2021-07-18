@@ -3,6 +3,7 @@ from celery import shared_task
 from celery_progress.backend import ProgressRecorder
 
 from .scrapper import Scrapper, NoSoupTypeError, NoLinksFoundError
+from .url_extractor import UrlPattern, UrlClass
 from .wordpress import WordpressAPI
 from .base_services import (
     PostsResponseHandler,
@@ -69,7 +70,9 @@ def get_wordpress_urls(self, post_type_url, is_update):
 
 @shared_task(bind=True, throws=(FakeNewsDoesNotExistError, WordpressDoesNotExistError),
              trail=True, name="register_wordpress_list_posts")
-def register_wordpress_list_posts(self, post_type_url_list):
+def register_wordpress_list_posts(self, post_type_url_list,
+                                  f_source_pattern=None, f_source_type=None, f_source_entire_link=None,
+                                  s_source_pattern=None, s_source_type=None, s_source_entire_link=None):
     try:
         progress_recorder = ProgressRecorder(self)
         progress_recorder.set_progress(0, len(post_type_url_list))
@@ -77,7 +80,11 @@ def register_wordpress_list_posts(self, post_type_url_list):
         count = 0
         for url in post_type_url_list:
             api = WordpressAPI(url)
-            posts = api.get_posts_content(url)
+
+            url_nodes = register_fake_news_source(f_source_pattern, f_source_type, f_source_entire_link,
+                                                  s_source_pattern, s_source_type, s_source_entire_link)
+            # send url_nodes, foreach post search --> modify urlextractor
+            posts = api.get_posts_content(url, url_nodes)
             progress_recorder.set_progress(count + 0.5, len(post_type_url_list))
 
             # register posts
@@ -122,26 +129,33 @@ def _register_new_wordpress(url, post_type):
                      FakeNewsAlreadyExistError, SoupAlreadyExistError, FakeNewsDoesNotExistError,
                      SoupDoesNotExistError, NoSoupTypeError, NoLinksFoundError),
              trail=True, name="register_new_soup_posts")
-def register_soup_posts(self, url, link_class, date_type, date_id, body_class, is_update):
+def register_soup_posts(self, is_update, url, link_class, date_type, date_id, body_class=None,
+                        f_source_pattern=None, f_source_type=None, f_source_entire_link=None,
+                        s_source_pattern=None, s_source_type=None, s_source_entire_link=None):
     try:
         progress_recorder = ProgressRecorder(self)
         progress_recorder.set_progress(0, 100)
 
+        print("body " + body_class)
         # get all links
         api = Scrapper(url, link_class, date_type, date_id, body_class)
         links = api.get_collection()
         progress_recorder.set_progress(40, 100)
+
         # if no failure, register soup
         if is_update:
             # get soup
             soup = _get_soup(url)
         else:
-            soup = _register_new_soup(url, link_class, date_type, date_id)
+            soup = _register_new_soup(url, link_class, date_type, date_id, body_class)
 
         progress_recorder.set_progress(50, 100)
 
+        url_nodes = register_fake_news_source(f_source_pattern, f_source_type, f_source_entire_link,
+                                              s_source_pattern, s_source_type, s_source_entire_link)
+
         # register links
-        posts = api.get_posts_content(links)
+        posts = api.get_posts_content(links, url_nodes)
         progress_recorder.set_progress(80, 100)
 
         # register posts
@@ -178,11 +192,37 @@ def _get_soup(url):
     return fakenews_qs.get()
 
 
-def _register_new_soup(url, link_class, date_type, date_id):
+def _register_new_soup(url, link_class, date_type, date_id, body_class=None):
     register = SoupRegister(
         url=url,
         link_class=link_class,
         date_type=date_type,
         date_id=date_id,
+        body_class=body_class
     )
     return register.execute()
+
+
+# Fake News Url
+def get_fake_news_source():
+    pass
+
+
+def register_fake_news_source(f_source_pattern=None, f_source_type=None, f_source_entire_link=None,
+                              s_source_pattern=None, s_source_type=None, s_source_entire_link=None):
+    # register fake news url/s
+    url_nodes = []
+    if f_source_pattern is not None and f_source_pattern != "":
+        url_nodes.append(_create_node(f_source_type, f_source_pattern, f_source_entire_link))
+
+    if s_source_pattern is not None and s_source_pattern != "":
+        url_nodes.append(_create_node(s_source_type, s_source_pattern, s_source_entire_link))
+
+    return url_nodes
+
+
+def _create_node(source_type, source_pattern, source_entire_link):
+    if source_type == "1":
+        return UrlPattern(source_pattern, source_entire_link)
+    else:
+        return UrlClass(source_pattern)

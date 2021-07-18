@@ -76,14 +76,15 @@ class TestWordpressRegisterExecute(TestCase):
 
 
 # POST #
-def create_post(link, date, title, content):
+def create_post(link, date, title, content, urls):
     # mock for "create_post" method on the PostRegister model
     # to avoid touching the database.
     return Post(
         link=link,
         date=date,
         title=title,
-        content=content
+        content=content,
+        fake_news_sources=urls
     )
 
 
@@ -94,7 +95,8 @@ class TestPostValidData(TestCase):
             link="www.wordpress.com/posts/1",
             date="01/01/2021",
             title="Post",
-            content="Post Content"
+            content="Post Content",
+            fake_news_sources=dict
         )
     )
 
@@ -105,7 +107,8 @@ class TestPostValidData(TestCase):
                 "www.wordpress.com/posts/1",
                 "01/01/2021",
                 "Post",
-                "Post Content"
+                "Post Content",
+                []
             )
             use_case.valid_data()
 
@@ -117,7 +120,8 @@ class TestPostValidData(TestCase):
             "www.wordpress.com/posts/1",
             "01/01/2021",
             "Post",
-            "Post Content"
+            "Post Content",
+            []
         )
         result = use_case.valid_data()
         assert result == expected_result
@@ -134,7 +138,8 @@ class TestPostRegisterExecute(TestCase):
             link="www.wordpress.com/posts/1",
             date="01/01/2021",
             title="Post",
-            content="Post Content"
+            content="Post Content",
+            source_urls=[]
         )
 
     def test_return_post_type(self, mock_create, mock_register):

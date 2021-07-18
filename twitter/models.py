@@ -7,7 +7,7 @@ class UserManager(models.Manager):
 
     def find_by_id(self, _id):
         queryset = self.get_queryset()
-        return queryset.filter(id=_id)
+        return queryset.filter(user_id=_id)
 
     def add_tweet(self, user, tweet):
         user.tweets.add(tweet)
@@ -32,7 +32,7 @@ class UserManager(models.Manager):
     def create_user(self, _id, name, username, created_at, description, location, profile_image_url, protected,
                     public_metrics, url, verified):
         user = User.objects.create(
-            id=_id,
+            user_id=_id,
             name=name,
             username=username,
             created_at=created_at,
@@ -49,7 +49,7 @@ class UserManager(models.Manager):
     def update_user(self, _id, name, username, created_at, description, location, profile_image_url, protected,
                     public_metrics, url, verified):
         return User.objects.find_by_id(_id).update(
-            id=_id,
+            user_id=_id,
             name=name,
             username=username,
             created_at=created_at,
@@ -63,7 +63,7 @@ class UserManager(models.Manager):
 
 
 class User(models.Model):
-    id = models.CharField(primary_key=True, max_length=120, unique=True)
+    user_id = models.CharField(max_length=120, unique=True, null=True)
     name = models.CharField(max_length=120)
     username = models.CharField(max_length=120)
     created_at = models.TextField()
@@ -78,7 +78,7 @@ class User(models.Model):
     objects = UserManager()
 
     def get_absolute_url(self):
-        return reverse("twitter:user-detail", kwargs={"id": self.id})
+        return reverse("twitter:user-detail", kwargs={"id": self.pk})
 
     def get_formatted_date(self):
         return dateparse.parse_datetime(self.created_at)
@@ -91,11 +91,11 @@ class TweetManager(models.Manager):
 
     def find_by_id(self, _id):
         queryset = self.get_queryset()
-        return queryset.filter(id=_id)
+        return queryset.filter(tweet_id=_id)
 
     def create_tweet(self, _id, text, author, conversation_id, created_at, lang):
         tweet = Tweet.objects.create(
-            id=_id,
+            tweet_id=_id,
             text=text,
             author=author,
             conversation_id=conversation_id,
@@ -106,7 +106,7 @@ class TweetManager(models.Manager):
 
     def update_tweet(self, _id, text, author, conversation_id, created_at, lang):
         return Tweet.objects.find_by_id(_id).update(
-            id=_id,
+            tweet_id=_id,
             text=text,
             author=author,
             conversation_id=conversation_id,
@@ -133,7 +133,7 @@ class Tweet(models.Model):
         ("3", "Unknown")
     )
 
-    id = models.CharField(primary_key=True, max_length=120, unique=True)  # max_lenght = required
+    tweet_id = models.CharField(max_length=120, unique=True, null=True)  # max_lenght = required
     text = models.TextField()
     author = models.OneToOneField('User', on_delete=models.CASCADE)
     conversation_id = models.TextField()
@@ -143,7 +143,7 @@ class Tweet(models.Model):
     objects = TweetManager()
 
     def get_absolute_url(self):
-        return reverse("twitter:tweet-detail", kwargs={"id": self.id})
+        return reverse("twitter:tweet-detail", kwargs={"id": self.pk})
 
     def get_formatted_date(self):
         return dateparse.parse_datetime(self.created_at)

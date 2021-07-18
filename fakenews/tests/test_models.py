@@ -15,7 +15,8 @@ class TestModelsManager(TestCase):
             link="www.wordpress.com/posts/1",
             date="01/01/2021",
             title="Post",
-            content="Post Content"
+            content="Post Content",
+            fake_news_sources=[]
         )
     ]
     qs_post_mock = MockSet(post_object[0])
@@ -118,7 +119,7 @@ class TestModelsManager(TestCase):
 
     def test_post_update_result(self):
         post = self._generate_post()
-        Post.objects.update_post(date="test", link=post.link, title=post.title, content=post.content)
+        Post.objects.update_post(date="test", link=post.link, title=post.title, content=post.content, urls=[])
         post = Post.objects.find_by_link(post.link).get()
 
         self.assertEqual(post.date, "test")
@@ -146,5 +147,6 @@ class TestModelsManager(TestCase):
             link="www.wordpress.com/posts/1",
             date="01/01/2021",
             title="Post",
-            content="Post Content"
+            content="Post Content",
+            urls=[]
         )

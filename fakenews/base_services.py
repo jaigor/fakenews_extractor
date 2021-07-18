@@ -19,12 +19,25 @@ class FakeNewsResponseHandler:
 
     def __init__(
             self,
-            url=None
+            url=None,
+            f_source_type=None,
+            f_source_pattern=None,
+            f_source_entire_link=None,
+
+            s_source_type=None,
+            s_source_pattern=None,
+            s_source_entire_link=None,
     ):
         self._url = url
         self._model = FakeNews
         self._exception_not_exist = FakeNewsDoesNotExistError
         self._filename = "data.csv"
+        self._f_source_type = f_source_type
+        self._f_source_pattern = f_source_pattern
+        self._f_source_entire_link = f_source_entire_link
+        self._s_source_type = s_source_type
+        self._s_source_pattern = s_source_pattern
+        self._s_source_entire_link = s_source_entire_link
 
     def handle_response(self):
         try:
@@ -105,12 +118,13 @@ class PostsResponseHandler:
     def handle_post_response(self, fakenews, posts):
         try:
             for post in posts:
-                # register each post [date, link, title, content]
+                # register each post [date, link, title, content, [fake_news_urls]]
                 new_post = self._register_post(
                     post[0],
                     post[1],
                     post[2],
-                    post[3])
+                    post[3],
+                    post[4])
                 # and add to fakenews
                 FakeNews.objects.add_post(fakenews, new_post)
         except (
@@ -119,11 +133,12 @@ class PostsResponseHandler:
         ) as err:
             raise ResponseHandlerError(_(str(err)))
 
-    def _register_post(self, date, link, title, content):
+    def _register_post(self, date, link, title, content, urls):
         register = PostRegister(
             date=date,
             link=link,
             title=title,
-            content=content
+            content=content,
+            source_urls=urls
         )
         return register.execute()

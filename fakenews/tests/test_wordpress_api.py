@@ -44,7 +44,7 @@ class TestWordpressAPI(TestCase):
         correct_post = WordpressAPI(
             "https://www.snopes.com/"  # this can change with time
         )
-        posts = correct_post.get_posts_content("https://www.snopes.com/wp-json/wp/v2/posts/")
+        posts = correct_post.get_posts_content("https://www.snopes.com/wp-json/wp/v2/posts/", None)
         assert len(posts) > 0
 
     def test_get_csv_response_and_check_file_is_deleted(self):
@@ -52,7 +52,7 @@ class TestWordpressAPI(TestCase):
             "https://www.snopes.com/"  # this can change with time
         )
         filename = "data.csv"
-        posts = correct_post.get_posts_content("https://www.snopes.com/wp-json/wp/v2/posts/")
+        posts = correct_post.get_posts_content("https://www.snopes.com/wp-json/wp/v2/posts/", None)
         response = correct_post.get_csv_response(filename, posts, ['date', 'link', 'title', 'content'])
 
         assert not os.path.isfile(filename)
@@ -62,7 +62,7 @@ class TestWordpressAPI(TestCase):
             "https://www.snopes.com/"  # this can change with time
         )
         filename = "data.csv"
-        posts = correct_post.get_posts_content("https://www.snopes.com/wp-json/wp/v2/posts/")
+        posts = correct_post.get_posts_content("https://www.snopes.com/wp-json/wp/v2/posts/", None)
         response = correct_post.get_csv_response(filename, posts, ['date', 'link', 'title', 'content'])
 
         assert isinstance(response, HttpResponse)

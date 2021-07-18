@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from .base_models import FakeNewsManager, FakeNews
 
 
@@ -85,22 +86,24 @@ class PostManager(models.Manager):
         queryset = self.get_queryset()
         return queryset.filter(link=link)
 
-    def create_post(self, date, link, title, content):
+    def create_post(self, date, link, title, content, urls):
         post = Post.objects.create(
             date=date,
             link=link,
             title=title,
             content=content,
+            fake_news_sources=urls,
         )
         post.save()
         return post
 
-    def update_post(self, date, link, title, content):
+    def update_post(self, date, link, title, content, urls):
         return Post.objects.find_by_link(link).update(
             date=date,
             link=link,
             title=title,
             content=content,
+            fake_news_sources=urls,
         )
 
     def get_all_posts(self):
@@ -110,7 +113,8 @@ class PostManager(models.Manager):
                 post.date,
                 post.link,
                 post.title,
-                post.content])
+                post.content,
+                post.fake_news_sources])
 
         return posts
 
@@ -127,6 +131,7 @@ class Post(models.Model):
     date = models.CharField(max_length=256)
     title = models.CharField(max_length=256, default='')
     content = models.TextField()
+    fake_news_sources = ArrayField(models.CharField(max_length=256), null=True, blank=True, default=dict)
     objects = PostManager()
 
     def __str__(self):

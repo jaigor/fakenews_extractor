@@ -2,7 +2,6 @@ from celery import chain
 from django.utils.translation import gettext as _
 
 from pages.downloader import Downloader
-from pages.text_processor import TextProcessor
 from .models import (
     Query
 )
@@ -87,14 +86,6 @@ class ResponseHandler:
             raise ResponseHandlerError(_(str(err)))
 
     def handle_search_response(self):
-        nouns = TextProcessor(self._query).extract_nouns()
-        print(nouns)
-
-        # join all query nouns
-        query = ' '.join(nouns)
-        # search for tweets
-        self._query = query
-
         # handle the output
         return self.handle_response()
 
