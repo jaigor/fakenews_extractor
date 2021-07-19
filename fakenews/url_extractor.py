@@ -82,13 +82,13 @@ class UrlExtractor:
                 # cut or not the link
                 if entire_link:
                     result = url
-                    #print(result)
-                    start_links.append(result)
                 else:
                     # get rest part of the link
-                    result = re.split(pattern, url)
-                    #print(result[1])
-                    start_links.append(result[1])
+                    result = (re.split(pattern, url))[1]
+
+                if result not in start_links:  # remove same links
+                    # print(result)
+                    start_links.append(result)
 
         return start_links
 
@@ -114,5 +114,6 @@ class UrlExtractor:
         soup = BeautifulSoup(content, 'html.parser')
         links = []
         for link in soup.find_all('a', class_=text):
-            links.append(link['href'])
+            if link not in links: # remove same links
+                links.append(link['href'])
         return links

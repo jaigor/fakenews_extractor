@@ -82,6 +82,10 @@ class Soup(FakeNews):
 # POSTS #
 class PostManager(models.Manager):
 
+    def find_by_id(self, pk):
+        queryset = self.get_queryset()
+        return queryset.filter(pk=pk)
+
     def find_by_link(self, link):
         queryset = self.get_queryset()
         return queryset.filter(link=link)

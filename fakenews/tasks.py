@@ -136,7 +136,9 @@ def register_soup_posts(self, is_update, url, link_class, date_type, date_id, bo
         progress_recorder = ProgressRecorder(self)
         progress_recorder.set_progress(0, 100)
 
-        print("body " + body_class)
+        if body_class is not None:
+            print("body " + body_class)
+
         # get all links
         api = Scrapper(url, link_class, date_type, date_id, body_class)
         links = api.get_collection()

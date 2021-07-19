@@ -14,6 +14,7 @@ from django.views.generic import (
 )
 
 from .base_views import SocialListView, SocialCreateView
+from .fake_source_services import FakeNewsHandler
 from .forms import QueryCreateForm
 from .models import Tweet, Query
 from .services import (
@@ -204,7 +205,7 @@ class TweetAutoCreateView(TweetCreateView):
             try:
                 self.template_name = 'twitters/query-create.html'
                 # get the input and delegate to process
-                self._run_search_handler(self.kwargs['text'])
+                self._run_search_handler(self.kwargs['pk'])
                 return render(request, self.template_name, self.context)
             except ResponseHandlerError as err:
                 context = {
@@ -214,11 +215,12 @@ class TweetAutoCreateView(TweetCreateView):
         else:
             return HttpResponseRedirect(reverse('twitter:query-list'))
 
-    def _run_search_handler(self, text):
-        print(text)
-        handler = ResponseHandler(
-            text
+    def _run_search_handler(self, pk):
+        print(pk)
+        handler = FakeNewsHandler(
+            pk
         )
         # handle the output
         result = handler.handle_search_response()
-        self.context['task_ids'] = [result, result.parent]
+        if result is not None:
+            self.context['task_ids'] = [result, result.parent]

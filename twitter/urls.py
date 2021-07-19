@@ -24,5 +24,5 @@ urlpatterns = [
     path('<int:pk>/createtweets/', TweetCreateView.as_view(), name='tweet-create'),
     path('<int:pk>/downloadtweets/', TweetDownloadView.as_view(), name='tweet-download'),
     path('<int:pk>/listtweet/', TweetListView.as_view(), name='tweet-list'),
-    path('create/<str:text>', TweetAutoCreateView.as_view(), name='tweet-create-text'),
+    path('create/<int:pk>', TweetAutoCreateView.as_view(), name='tweet-create-text'),
 ]

@@ -85,10 +85,6 @@ class ResponseHandler:
         ) as err:
             raise ResponseHandlerError(_(str(err)))
 
-    def handle_search_response(self):
-        # handle the output
-        return self.handle_response()
-
     def get_queryset(self, _id):
         try:
             return Query.objects.get_tweet_queryset(_id)

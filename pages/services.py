@@ -21,7 +21,7 @@ class UserDownloadResponseHandler(DownloadResponseHandler):
         super().__init__()
         self._objects = self._get_twitter_users()  # get Twitter users
         self._headers = ['name', 'username', 'created_at', 'description', 'location', 'profile_image_url', 'protected',
-                         'public_metrics', 'url', 'verified']
+                         'public_metrics', 'url', 'verified', 'tweets']
         self._filename = 'users.csv'
 
     def _get_twitter_users(self):

@@ -15,6 +15,10 @@ class UserManager(models.Manager):
     def get_all_users(self):
         users = []
         for user in User.objects.all():
+            tweets_ids = []
+            for tweet in user.tweets.all():
+                tweets_ids.append(tweet.tweet_id)
+
             users.append([
                 user.name,
                 user.username,
@@ -25,7 +29,8 @@ class UserManager(models.Manager):
                 user.protected,
                 user.public_metrics,
                 user.url,
-                user.verified
+                user.verified,
+                tweets_ids
             ])
         return users
 
