@@ -24,7 +24,8 @@ from pages.views import (
     CsvView,
     DownloadPostsView,
     DownloadUsersView,
-    DownloadTweetsView
+    DownloadTweetsView,
+    TweetClassifierView
 )
 
 urlpatterns = [
@@ -37,6 +38,7 @@ urlpatterns = [
     path('downloadposts/', DownloadPostsView.as_view(), name='download-posts'),
     path('downloadusers/', DownloadUsersView.as_view(), name='download-users'),
     path('downloadtweets/', DownloadTweetsView.as_view(), name='download-tweets'),
+    path('rankingtweets/', TweetClassifierView.as_view(), name='ranking-tweets'),
     path('celery-progress/', include('celery_progress.urls')),
     path('admin/', admin.site.urls),
 

@@ -216,7 +216,6 @@ class TweetAutoCreateView(TweetCreateView):
             return HttpResponseRedirect(reverse('twitter:query-list'))
 
     def _run_search_handler(self, pk):
-        print(pk)
         handler = FakeNewsHandler(
             pk
         )

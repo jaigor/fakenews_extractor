@@ -48,20 +48,38 @@
             </a>
           </div>
         </div>
-      </div>
+    </div>
 </div>
+
 <div class="container py-5">
-  <div class="col-md-4 d-flex align-items-start">
-    <div class="icon-square bg-light text-dark flex-shrink-0 me-3">
-      <img src="{% static 'file-csv.svg' %}" alt="Search" width="32" height="32">
+    <div class="row g-5 py-5">
+        <div class="col-md-4 d-flex align-items-start">
+          <div class="icon-square bg-light text-dark flex-shrink-0 me-3">
+            <img src="{% static 'noun_stats.svg' %}" alt="Search" width="32" height="32">
+          </div>
+          <div>
+            <h2>Clasificador</h2>
+            <p>Clasificador (seleccionable por modelo) de los tweets almacenados que ofrece un porcentaje de
+                difusión de fake news según el texto del tweet.</p>
+            <a href="/rankingtweets/" class="btn btn-primary">
+                Acceder
+            </a>
+          </div>
+        </div>
+
+        <div class="col-md-4 d-flex align-items-start">
+            <div class="icon-square bg-light text-dark flex-shrink-0 me-3">
+              <img src="{% static 'file-csv.svg' %}" alt="Search" width="32" height="32">
+            </div>
+            <div>
+              <h2>Descarga de CSV</h2>
+              <p>Listados de ficheros CSV con posibilidad de descargar de la información perteneciente a los extractores.</p>
+              <a href="/csv/" class="btn btn-primary">
+                  Acceder
+              </a>
+            </div>
+            </div>
+        </div>
     </div>
-    <div>
-      <h2>Descarga de CSV</h2>
-      <p>Listados de ficheros CSV con posibilidad de descargar de la información perteneciente a los extractores.</p>
-      <a href="/csv/" class="btn btn-primary">
-          Acceder
-      </a>
-    </div>
-  </div>
 </div>
 {% endblock %}

@@ -1,5 +1,6 @@
 from django.apps import apps
 from .base_services import DownloadResponseHandler
+from .classifier import Classifier
 
 
 class PostDownloadResponseHandler(DownloadResponseHandler):
@@ -33,10 +34,29 @@ class TweetDownloadResponseHandler(DownloadResponseHandler):
 
     def __init__(self):
         super().__init__()
-        self._objects = self._get_twitter_tweets()  # get Twitter tweets
-        self._headers = ['text', 'author', 'conversation_id', 'created_at', 'lang']
+        self._objects = self.get_twitter_tweets()  # get Twitter tweets
+        self._headers = ['text', 'author', 'conversation_id', 'created_at', 'lang', 'spreader', 'percentage']
         self._filename = 'tweets.csv'
 
-    def _get_twitter_tweets(self):
+    def get_twitter_tweets(self):
         tweet_model = apps.get_app_config('twitter').get_model('Tweet')
         return tweet_model.objects.get_all_tweets()
+
+    def get_twitter_tweets_choices(self):
+        tweet_model = apps.get_app_config('twitter').get_model('Tweet')
+        return tweet_model.objects.get_all_tweets_choices()
+
+    @property
+    def objects(self):
+        return self._objects
+
+
+class ClassifierResponseHandler:
+
+    def __init__(self, method, tweets):
+        super().__init__()
+        self._method = method
+        self._tweets = tweets
+
+    def handle_classifier(self):
+        return Classifier(self._method, self._tweets).loading_classifier()

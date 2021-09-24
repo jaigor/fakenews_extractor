@@ -4,7 +4,7 @@ from .models import Query
 
 class QueryCreateForm(forms.ModelForm):
 
-    query = forms.CharField(
+    text = forms.CharField(
         label='Texto a buscar',
         max_length=512,
         widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -12,8 +12,8 @@ class QueryCreateForm(forms.ModelForm):
     class Meta:
         model = Query
         fields = [
-            'query'
+            'text'
         ]
 
     def clean_query(self):
-        return self.cleaned_data.get('query')
+        return self.cleaned_data.get('text')

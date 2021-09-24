@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load static %}
+<div class="container py-5">
+    <div class="icon-square bg-light text-dark flex-shrink-0 me-3">
+        <img src="{% static 'noun_stats.svg' %}" alt="Ranking" width="60" height="60">
+        <h1 class="pb-2 border-bottom">Ranking de tweets</h1>
+    </div>
+      <div class="row g-5 py-5">
+        <div>
+          <h2>Tweets</h2>
+            {% if results %}
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Tweet</th>
+                      <th scope="col">Autor</th>
+                      <th scope="col">Difunde</th>
+                      <th scope="col">Porcentaje</th>
+                    </tr>
+                  </thead>
+                    <tbody>
+                {% for tweet in results %}
+                    <tr>
+                      <th scope="row">{{ tweet.text }}</th>
+                      <td>{{ tweet.author }}</td>
+                      <td>{{ tweet.spreader }}</td>
+                      <td>{{ tweet.percentage  }}</td>
+                    </tr>
+                {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+
+          <p>Escoja los tweets que quiere evaluar para el ranking con el modelo clasificador.</p>
+            <form action='.' method='POST'>  {% csrf_token %}
+                <div class="mb-3">
+                    <div class="row">
+                        <div class="col-2">
+                            <div class="form-group">
+                              {{ form.method.errors }}
+                              {{ form.method.label_tag }}
+                              {{ form.method }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                          {{ form.tweets.errors }}
+                          {{ form.tweets.label_tag }}
+                            {% for radio in form.tweets %}
+                            <div class="form-check">
+                                {{ radio }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <input type='submit' value='Generar' class="btn btn-primary" />
+            </form>
+        </div>
+      </div>
+</div>
+
+
+{% endblock %}

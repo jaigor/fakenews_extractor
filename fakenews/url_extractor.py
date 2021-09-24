@@ -42,7 +42,7 @@ class UrlExtractor:
         # self._pattern = '^https://web.archive.org/web/\w*/$'
 
     def get_source_links(self):
-        if self._url_nodes is None:
+        if self._url_nodes is None or self._url_nodes == []:
             return []
 
         source_links = self._get_node_links(self._content, self._url_nodes[0])

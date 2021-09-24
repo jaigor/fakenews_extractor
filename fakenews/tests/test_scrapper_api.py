@@ -48,7 +48,7 @@ class TestScrapperAPI(TestCase):
             dateId=1,
             dateType="article-date"
         )
-        links = ['https://www.maldita.es/malditobulo/20210610/iman-vial-vacuna-covid-19-nanoparticulas-magneticas/']
+        links = ['https://maldita.es/malditobulo/20210922/rumania-video-protesta-cierre-centros-vacunacion-covid-19/']
         posts = correct_soup.get_posts_content(links)
         assert len(posts) > 0
 

@@ -118,6 +118,26 @@ class TweetManager(models.Manager):
             created_at=created_at,
             lang=lang)
 
+    def update_spreader(self, _id, _percentage):
+        tweet = Tweet.objects.find_by_id(_id).get()
+        # spreader > 0.78
+        spreader = False
+
+        if _percentage > 0.78:
+            spreader = True
+
+        Tweet.objects.find_by_id(_id).update(
+            tweet_id=_id,
+            text=tweet.text,
+            author=tweet.author,
+            conversation_id=tweet.conversation_id,
+            created_at=tweet.created_at,
+            lang=tweet.lang,
+            spreader=spreader,
+            percentage=_percentage)
+
+        return Tweet.objects.find_by_id(_id).get()
+
     def get_all_tweets(self):
         tweets = []
         for tweet in Tweet.objects.all():
@@ -126,17 +146,21 @@ class TweetManager(models.Manager):
                 tweet.author.name,
                 tweet.conversation_id,
                 tweet.created_at,
-                tweet.lang
+                tweet.lang,
+                tweet.spreader,
+                tweet.percentage
             ])
+        return tweets
+
+    def get_all_tweets_choices(self):
+        tweets = ()
+        for tweet in Tweet.objects.all():
+            tweets = tweets + ((tweet.tweet_id, tweet.text),)
+
         return tweets
 
 
 class Tweet(models.Model):
-    TYPE_TEXT = (
-        ("1", "Fake"),
-        ("2", "True"),
-        ("3", "Unknown")
-    )
 
     tweet_id = models.CharField(max_length=120, unique=True, null=True)  # max_lenght = required
     text = models.TextField()
@@ -144,7 +168,8 @@ class Tweet(models.Model):
     conversation_id = models.TextField()
     created_at = models.TextField()
     lang = models.CharField(null=True, max_length=5)
-    text_type = models.CharField(max_length=1, choices=TYPE_TEXT, default="3")
+    spreader = models.BooleanField(null=True, default=False)
+    percentage = models.FloatField(null=True, default=0.0)
     objects = TweetManager()
 
     def get_absolute_url(self):
@@ -195,7 +220,7 @@ class QueryManager(models.Manager):
 
 
 class Query(models.Model):
-    text = models.CharField(max_length=256, unique=True)  # max_lenght = required
+    text = models.CharField(max_length=512, unique=True)  # max_lenght = required
     tweets = models.ManyToManyField('Tweet', blank=True)  # can be null = Empty
     objects = QueryManager()
     path_detail = "twitter:query-detail"
@@ -225,5 +250,5 @@ class Query(models.Model):
     def get_users_url(self):
         return reverse("twitter:user-list", kwargs={"pk": self.pk})
 
-    def __str__(self):
-        return self.text
+    #def __str__(self):
+    #    return self.text

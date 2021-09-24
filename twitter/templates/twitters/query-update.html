@@ -9,7 +9,11 @@
     <p>Rellene los datos del formulario para obtener la información</p>
     <form action='.' method='POST'>  {% csrf_token %}
         <div class="mb-3">
-            {{ form }}
+            <div class="form-group">
+                {{ form.text.errors }}
+                {{ form.text.label_tag }}
+                {{ form.text }}
+            </div>
         </div> 
         <input type='submit' value='Actualizar' class="btn btn-primary" />
 
