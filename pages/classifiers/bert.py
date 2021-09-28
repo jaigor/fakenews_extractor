@@ -274,7 +274,7 @@ class BERT:
         print(f'Accuracy: {accuracy}')
 
         self.test_model(classifier_model)
-        #self.export_model(classifier_model)
+        self.export_model(classifier_model)
         self.reload_model()
 
     def test_model(self, classifier_model):
