@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'twitters/twitter-header.html' %}
+<div class="container">
+    <h1>Detalle Tweet</h1>
+    <p>Información</p>
+    <ul>
+        <li>{{ object.text }}</li>
+        <li>{{ object.created_at }}</li>
+        <li>{{ object.lang }}</li>
+        <li>{{ object.spreader }}</li>
+        <li>{{ object.percentage }}</li>
+    </ul>
+    <hr class="my-4">
+</div>
+{% endblock %}

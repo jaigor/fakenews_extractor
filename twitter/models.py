@@ -171,9 +171,18 @@ class Tweet(models.Model):
     spreader = models.BooleanField(null=True, default=False)
     percentage = models.FloatField(null=True, default=0.0)
     objects = TweetManager()
+    path_detail = "twitter:tweet-detail"
+    path_update = "twitter:tweet-update"
+    path_delete = "twitter:tweet-delete"
 
     def get_absolute_url(self):
-        return reverse("twitter:tweet-detail", kwargs={"id": self.pk})
+        return reverse(self.path_detail, kwargs={"id": self.pk})
+
+    def get_update_url(self):
+        return reverse(self.path_update, kwargs={"pk": self.pk})
+
+    def get_delete_url(self):
+        return reverse(self.path_delete, kwargs={"pk": self.pk})
 
     def get_formatted_date(self):
         return dateparse.parse_datetime(self.created_at)

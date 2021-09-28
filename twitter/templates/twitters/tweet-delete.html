@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% include 'twitters/twitter-header.html' %}
+<div class="container">
+    <h1>Eliminar Tweet</h1>
+
+    <p>¿Desea eliminar el objeto {{ object.id }} {{ object.text }}?</p>
+    <form action='.' method='POST'>  {% csrf_token %}
+        <input type='submit' value='Eliminar' class="btn btn-primary" />
+    </form>
+</div>
+{% endblock %}

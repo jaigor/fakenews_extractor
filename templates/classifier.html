@@ -18,6 +18,7 @@
                       <th scope="col">Autor</th>
                       <th scope="col">Difunde</th>
                       <th scope="col">Porcentaje</th>
+                      <th scope="col">Actualizar</th>
                     </tr>
                   </thead>
                     <tbody>
@@ -27,6 +28,7 @@
                       <td>{{ tweet.author }}</td>
                       <td>{{ tweet.spreader }}</td>
                       <td>{{ tweet.percentage  }}</td>
+                      <td><a href={{ tweet.get_update_url }}><img src="{% static 'arrow-counterclockwise.svg' %}" alt="update" width="16" height="16"> </a></td>
                     </tr>
                 {% endfor %}
                     </tbody>

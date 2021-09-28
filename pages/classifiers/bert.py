@@ -185,7 +185,6 @@ class BERT:
         batch_size = 12
         seed = 42
 
-        # ES version
         raw_train_ds = tf.keras.preprocessing.text_dataset_from_directory(
             file_path,
             batch_size=batch_size,

@@ -15,7 +15,7 @@ from django.views.generic import (
 
 from .base_views import SocialListView, SocialCreateView
 from .fake_source_services import FakeNewsHandler
-from .forms import QueryCreateForm
+from .forms import QueryCreateForm, TweetUpdateForm
 from .models import Tweet, Query
 from .services import (
     ResponseHandler,
@@ -173,6 +173,33 @@ class TweetCreateView(DetailView):
             obj.text
         )
         handler.handle_update_response()
+
+
+class TweetUpdateView(UpdateView):
+    template_name = 'twitters/tweet-update.html'
+    form_class = TweetUpdateForm
+    path_detail = 'twitter:tweet-detail'
+    queryset = Tweet.objects.all()
+
+    def get_success_url(self):
+        return reverse(self.path_detail, kwargs={'pk': self.get_object().id})
+
+    def form_valid(self, form):
+        return super().form_valid(form)
+
+
+class TweetDetailView(DetailView):
+    template_name = 'twitters/tweet-detail.html'
+    model = Tweet
+
+
+class TweetDeleteView(DeleteView):
+    template_name = 'twitters/tweet-delete.html'
+    model = Tweet
+    path_create = 'twitter:tweet-create'
+
+    def get_success_url(self):
+        return reverse(self.path_create)
 
 
 class TweetDownloadView(SocialCreateView):

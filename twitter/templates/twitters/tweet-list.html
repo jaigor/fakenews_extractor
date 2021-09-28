@@ -19,7 +19,7 @@
     <p>Listado de tweets almacenados:</p>
     <ul>
         {% for tweet in tweets  %}
-            <li>{{ tweet.text }}</li>
+            <li>{{ tweet.text }} <a href={{ tweet.get_update_url }}><img src="{% static 'arrow-counterclockwise.svg' %}" alt="update" width="16" height="16"> </a></li>
         {% empty %}
             <li>No hay tweets registrados.</li>
         {% endfor %}
