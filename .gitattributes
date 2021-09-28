@@ -1,6 +1,7 @@
 pages/classifiers/fake_news_twitter_bert/** filter=lfs diff=lfs merge=lfs -text
+pages/classifiers/fake_news_twitter_bert/ filter=lfs diff=lfs merge=lfs -text
+pages/classifiers/fake_news_twitter_bert/keras_metadata.pb filter=lfs diff=lfs merge=lfs -text
+pages/classifiers/fake_news_twitter_bert/saved_model.pb filter=lfs diff=lfs merge=lfs -text
 pages/classifiers/fake_news_twitter_bert/variables/variables.data-00000-of-00001 filter=lfs diff=lfs merge=lfs -text
 pages/classifiers/fake_news_twitter_bert/variables/variables.index filter=lfs diff=lfs merge=lfs -text
 pages/classifiers/fake_news_twitter_bert/assets/vocab.txt filter=lfs diff=lfs merge=lfs -text
-pages/classifiers/fake_news_twitter_bert/keras_metadata.pb filter=lfs diff=lfs merge=lfs -text
-pages/classifiers/fake_news_twitter_bert/saved_model.pb filter=lfs diff=lfs merge=lfs -text
