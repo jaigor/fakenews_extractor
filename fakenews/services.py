@@ -17,7 +17,8 @@ from .tasks import (
     WordpressDoesNotExistError,
     WordpressAlreadyExistError,
     SoupDoesNotExistError,
-    SoupAlreadyExistError
+    SoupAlreadyExistError,
+    FakeNewsError
 )
 
 
@@ -62,6 +63,9 @@ class WordpressResponseHandler(FakeNewsResponseHandler):
         except (WordpressAlreadyExistError, FakeNewsAlreadyExistError) as err:
             result.revoke()
             raise FakeNewsAlreadyExistError(_(str(err)))
+        except Exception as err:
+            result.revoke()
+            raise FakeNewsError(_(str(err)))
 
     def _update(self):
         result = None
@@ -76,6 +80,9 @@ class WordpressResponseHandler(FakeNewsResponseHandler):
         except (self._exception_not_exist, FakeNewsDoesNotExistError) as err:
             result.revoke()
             raise FakeNewsDoesNotExistError(_(str(err)))
+        except Exception as err:
+            result.revoke()
+            raise FakeNewsError(_(str(err)))
 
     def _get_filename(self):
         return (self._get_fakenews()).post_type + '.csv'
@@ -122,6 +129,9 @@ class SoupResponseHandler(FakeNewsResponseHandler):
         except (SoupAlreadyExistError, FakeNewsAlreadyExistError) as err:
             result.revoke()
             raise FakeNewsAlreadyExistError(_(str(err)))
+        except Exception as err:
+            result.revoke()
+            raise FakeNewsError(_(str(err)))
 
     def _update(self):
         result = None
@@ -136,6 +146,9 @@ class SoupResponseHandler(FakeNewsResponseHandler):
         except (self._exception_not_exist, FakeNewsDoesNotExistError) as err:
             result.revoke()
             raise FakeNewsDoesNotExistError(_(str(err)))
+        except Exception as err:
+            result.revoke()
+            raise FakeNewsError(_(str(err)))
 
     def _get_filename(self):
         return urlparse(self._url).netloc + '.csv'

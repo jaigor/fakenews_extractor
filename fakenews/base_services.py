@@ -6,11 +6,11 @@ from .base_register import (
     PostRegister,
     PostAlreadyExistError,
     FakeNewsDoesNotExistError,
-    FakeNewsAlreadyExistError, PostDoesNotExistError
+    FakeNewsAlreadyExistError,
+    PostDoesNotExistError
 )
 
 
-# Custom Exceptions
 class ResponseHandlerError(Exception):
     pass
 
@@ -42,17 +42,13 @@ class FakeNewsResponseHandler:
     def handle_response(self):
         try:
             return self._handle()
-        except (
-                FakeNewsAlreadyExistError
-        ) as err:
+        except Exception as err:
             raise ResponseHandlerError(_(str(err)))
 
     def handle_update_response(self):
         try:
             return self._update()
-        except (
-                FakeNewsDoesNotExistError
-        ) as err:
+        except Exception as err:
             raise ResponseHandlerError(_(str(err)))
 
     def handle_download_response(self):

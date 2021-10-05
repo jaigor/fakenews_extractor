@@ -58,7 +58,7 @@ class QueryCreateView(CreateView):
 
     def _run_handler(self, form):
         handler = ResponseHandler(
-            form.cleaned_data['query']
+            form.cleaned_data['text']
         )
         # handle the output
         try:
@@ -66,7 +66,7 @@ class QueryCreateView(CreateView):
             self.context['task_ids'] = [result, result.parent]
 
         except ResponseHandlerError as err:
-            form.add_error('query', str(err))
+            form.add_error('text', str(err))
 
 
 class QueryUpdateView(UpdateView):
@@ -108,7 +108,7 @@ class QueryUpdateView(UpdateView):
 
     def _run_handler(self, form):
         handler = ResponseHandler(
-            form.cleaned_data['query']
+            form.cleaned_data['text']
         )
         # handle the output
         try:
@@ -116,7 +116,7 @@ class QueryUpdateView(UpdateView):
             self.context['task_ids'] = [result, result.parent]
 
         except ResponseHandlerError as err:
-            form.add_error('query', str(err))
+            form.add_error('text', str(err))
 
 
 class QueryDetailView(DetailView):

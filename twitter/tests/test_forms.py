@@ -7,15 +7,15 @@ class TestTwitterForms(TestCase):
 
     def test_query_with_no_text_throw_error(self):
         data = {
-            'query': ''
+            'text': ''
         }
 
         form = QueryCreateForm(data=data)
-        assert 'query' in form.errors
+        assert 'text' in form.errors
 
     def test_create_filled_up_and_the_form_is_valid(self):
         data = {
-            'query': 'Test'
+            'text': 'Test'
         }
 
         form = QueryCreateForm(data=data)

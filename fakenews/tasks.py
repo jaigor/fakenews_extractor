@@ -4,7 +4,7 @@ from celery_progress.backend import ProgressRecorder
 
 from .scrapper import Scrapper, NoSoupTypeError, NoLinksFoundError
 from .url_extractor import UrlPattern, UrlClass
-from .wordpress import WordpressAPI
+from .wordpress import WordpressAPI, TooManyRequestError, NoOKResponseError
 from .base_services import (
     PostsResponseHandler,
     FakeNewsDoesNotExistError,
@@ -36,7 +36,12 @@ class WordpressAlreadyExistError(Exception):
     pass
 
 
-@shared_task(bind=True, throws=(FakeNewsAlreadyExistError, WordpressAlreadyExistError),
+class FakeNewsError(Exception):
+    pass
+
+
+@shared_task(bind=True, throws=(FakeNewsAlreadyExistError, WordpressAlreadyExistError,
+                                TooManyRequestError, NoOKResponseError, FakeNewsError),
              trail=True, name="get_wordpress_urls")
 def get_wordpress_urls(self, post_type_url, is_update):
     try:
@@ -66,9 +71,12 @@ def get_wordpress_urls(self, post_type_url, is_update):
         raise FakeNewsAlreadyExistError(_(str(err)))
     except WordpressAlreadyExistError as err:
         raise WordpressAlreadyExistError(_(str(err)))
+    except (TooManyRequestError, NoOKResponseError) as err:
+        raise FakeNewsError(_(str(err)))
 
 
-@shared_task(bind=True, throws=(FakeNewsDoesNotExistError, WordpressDoesNotExistError),
+@shared_task(bind=True, throws=(FakeNewsDoesNotExistError, WordpressDoesNotExistError,
+                                TooManyRequestError, NoOKResponseError),
              trail=True, name="register_wordpress_list_posts")
 def register_wordpress_list_posts(self, post_type_url_list,
                                   f_source_pattern=None, f_source_type=None, f_source_entire_link=None,
