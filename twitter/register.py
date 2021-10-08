@@ -1,4 +1,4 @@
-import spacy
+# import spacy
 from django.utils.translation import gettext as _
 
 from twitter.models import Query, Tweet, User
@@ -103,24 +103,24 @@ class TweetRegister:
             created_at=self._created_at,
             lang=self._lang)
 
-    def _get_text_type(self):
-        if self._lang == "es":
-            self.nlp = spacy.load("es_dep_news_trf")
-        else:
-            self.nlp = spacy.load("en_core_web_trf")
-
-        doc = self.nlp(self._text)
-        
-        words = []
-        for token in doc:
-            if token.pos_ != "ADP" or token.pos_ != "AUX":
-                words.append(token.text)
-
-        # join all query nouns
-        query = ' '.join(words)
-        print(query)
-        # search for tweets
-        self._query = query
+    # def _get_text_type(self):
+    #     if self._lang == "es":
+    #         self.nlp = spacy.load("es_dep_news_trf")
+    #     else:
+    #         self.nlp = spacy.load("en_core_web_trf")
+    #
+    #     doc = self.nlp(self._text)
+    #
+    #     words = []
+    #     for token in doc:
+    #         if token.pos_ != "ADP" or token.pos_ != "AUX":
+    #             words.append(token.text)
+    #
+    #     # join all query nouns
+    #     query = ' '.join(words)
+    #     print(query)
+    #     # search for tweets
+    #     self._query = query
 
 
 # User #
